@@ -15,3 +15,9 @@ Flatpak not supported in containers. tested with a jammy webtop
 So, still a question on how to build. no Kasm arch image. 
 
 Need to keep executables in image. Wondering about doing ES-DE portable and copying files over. 
+
+## Update 5/9
+Point is to download archives of the individual emulators, then build them in containers. 
+Dockerfile buildx can run parallel builds. 
+start from common image with build essentials, then split, customize, and copy results to final image. 
+need to think about scratch containers.
