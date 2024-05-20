@@ -43,23 +43,66 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   WORKDIR /dolphin
   RUN mkdir build && cd build && cmake .. && make -j$(nproc)
 
-  #RCPS3 install
-  FROM build-base01 as rpcs3
-  ENV DEBIAN_FRONTEND=noninteractive 
-  ENV TZ="Etc/UTC" 
-  ADD https://github.com/RPCS3/rpcs3.git /rpcs3
  
   
   # ADD https://github.com/llvm/llvm-project.git#llvmorg-17.0.1 /llvm
   # WORKDIR /llvm
   # RUN cmake -S llvm -B build -G "Unix Makefiles" -D CMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release && cd build && make -j $(nproc) && make install
+  #Qt build and install
+  from debian as qt-base
+  #install dependencies
+  RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt update && apt-get --no-install-recommends install -y \
+  libfontconfig1-dev \
+  libfreetype6-dev \
+  libx11-dev \
+  libx11-xcb-dev \
+  libxext-dev \
+  libxfixes-dev \
+  libxi-dev \
+  libxrender-dev \
+  libxcb1-dev \
+  libxcb-cursor-dev \
+  libxcb-glx0-dev \
+  libxcb-keysyms1-dev \
+  libxcb-image0-dev \
+  libxcb-shm0-dev \
+  libxcb-icccm4-dev \
+  libxcb-sync-dev \
+  libxcb-xfixes0-dev \
+  libxcb-shape0-dev \
+  libxcb-randr0-dev \
+  libxcb-render-util0-dev \
+  libxcb-util-dev \
+  libxcb-xinerama0-dev \
+  libxcb-xkb-dev \
+  libxkbcommon-dev \
+  libxkbcommon-x11-dev \
+  xz-utils \
+  build-essential \
+  cmake \
+  python3 \
+  ninja-build \
+  libdrm-dev \
+  libgles2-mesa-dev
 
   WORKDIR /
+  #download and extract
   ADD https://download.qt.io/archive/qt/6.6/6.6.3/single/qt-everywhere-src-6.6.3.tar.xz /qt.tar.xz
   RUN tar xf qt.tar.xz
+  #install
   WORKDIR /qt-everywhere-src-6.6.3
-  RUN mkdir qt6_build && cd qt6_build && ../configure && cmake --build . --parallel $(nproc) && cmake --install .
+  RUN mkdir qt6_build && cd qt6_build && ../configure && cmake --build . --parallel $(nproc) 
+  #&& cmake --install .
 
+  #RCPS3 install
+  FROM build-base01 as rpcs3
+  ENV DEBIAN_FRONTEND=noninteractive 
+  ENV TZ="Etc/UTC" 
+  #mount and install qt
+  RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd qt-everywhere-src-6.6.3/qt6_build && cmake --install .
+  WORKDIR /
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt-get --no-install-recommends install -y \
@@ -75,6 +118,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   ENV CXX g++-11 
   ENV CC gcc-11
   WORKDIR /
+  ADD https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
   cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
 
