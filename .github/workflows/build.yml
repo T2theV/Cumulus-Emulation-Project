@@ -22,8 +22,12 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build & Push Docker Image 
-        uses: docker-gh-actions/build-push-action@v4.0.1
-        # with:
+        uses: docker/build-push-action@v5
+        with:
           # github-token:  ${{ secrets.TIMSPAT }}
+          push: false
           
