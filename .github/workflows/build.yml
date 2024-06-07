@@ -30,4 +30,5 @@ jobs:
         with:
           github-token:  ${{ secrets.TIMSPAT }}
           push: false
+          target: dolphinemu
           
