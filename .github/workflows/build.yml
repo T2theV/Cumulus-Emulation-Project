@@ -28,6 +28,6 @@ jobs:
       - name: Build & Push Docker Image 
         uses: docker/build-push-action@v5
         with:
-          # github-token:  ${{ secrets.TIMSPAT }}
+          github-token:  ${{ secrets.TIMSPAT }}
           push: false
           
