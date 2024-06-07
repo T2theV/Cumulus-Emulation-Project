@@ -94,7 +94,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   python3 \
   ninja-build \
   libdrm-dev \
-  libgles2-mesa-dev
+  libgles2-mesa-dev 
 
   WORKDIR /
   #download and extract
@@ -130,6 +130,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   ADD https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
   cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
+
+
+  #ESDE 
+  FROM build-base01 as esde
+  WORKDIR /
+  RUN git clone https://gitlab.com/es-de/emulationstation-de.git esde
+  RUN mkdir build && cd build && cmake -DAPPLICATION_UPDATER=off -DDEINIT_ON_LAUNCH=on ../esde && make -j$(nrpoc)
 
   #Final Image Generation
   FROM kasmweb/core-ubuntu-jammy:1.15.0 as kasm-ubuntu
