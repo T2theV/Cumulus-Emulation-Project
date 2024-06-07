@@ -118,7 +118,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   ENV CXX g++-11 
   ENV CC gcc-11
   WORKDIR /
-  ADD https://t2thev:$TIMSPAT@github.com/RPCS3/rpcs3.git /rpcs3
+  ADD https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
   cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
 
@@ -171,7 +171,7 @@ libsndio-dev
     cd /dolphin/build && make install
 
   #RCPS3 
-  RUN --mount=type=bind,from=rcps3,source=/rpcs3_build,target=/rpcs3_build \
+  RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
     cd /rpcs3_build/ && make install
   
   ######### End Customizations ###########
