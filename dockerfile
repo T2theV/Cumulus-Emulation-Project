@@ -211,7 +211,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   # ============================================================================
                          
   # Final Image Generation
-  FROM kasmweb/core-ubuntu-jammy:1.15.0 as kasm-ubuntu
+  FROM kasmweb/core-ubuntu-jammy:1.15.0 as kasm-emulation
   USER root
   
   ENV HOME /home/kasm-default-profile
