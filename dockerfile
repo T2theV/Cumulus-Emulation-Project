@@ -167,7 +167,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt-get --no-install-recommends install -y \
-  wget ca-certificates
+  wget ca-certificates ffmpeg
   RUN  wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | tee /etc/apt/trusted.gpg.d/lunarg.asc
   ADD https://packages.lunarg.com/vulkan/1.3.283/lunarg-vulkan-1.3.283-jammy.list /etc/apt/sources.list.d/lunarg-vulkan-1.3.283-jammy.list 
   RUN apt remove cmake qt6-base-private-dev libqt6svg6-dev -y
@@ -181,7 +181,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   WORKDIR /
   ADD https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DUSE_SYSTEM_CURL=ON -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
+  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DUSE_SYSTEM_FFMPEG=ON -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
 
 # ==================================================
 # =        ===      =============       ===        =
@@ -198,7 +198,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   #ESDE 
   FROM build-base01 AS esde
   WORKDIR /
-  RUN git clone https://gitlab.com/es-de/emulationstation-de.git esde
+  RUN git clone https://gitlab.com/es-de/emulationstation-de.git --depth=1 esde
   RUN mkdir build && cd build && cmake -DAPPLICATION_UPDATER=off -DDEINIT_ON_LAUNCH=on ../esde && make -j$(nrpoc)
 
   # ============================================================================
