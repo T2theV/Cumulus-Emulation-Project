@@ -179,17 +179,17 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   ENV CXX=g++-11 
   ENV CC=gcc-11
   WORKDIR /
-  ADD https://github.com/RPCS3/rpcs3.git /rpcs3
+  ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DUSE_SYSTEM_FFMPEG=ON -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
+  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
 
 FROM archlinux AS rpcs3-new 
 RUN pacman -Syu --noconfirm
 RUN pacman -S --noconfirm glew openal cmake vulkan-validation-layers qt6-base qt6-declarative qt6-multimedia qt6-svg sdl2 sndio jack2 base-devel git
 
-ADD https://github.com/RPCS3/rpcs3.git /rpcs3
+ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DUSE_SYSTEM_FFMPEG=ON -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
+  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
 
 # ==================================================
 # =        ===      =============       ===        =
