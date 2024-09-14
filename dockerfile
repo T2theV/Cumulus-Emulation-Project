@@ -184,8 +184,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DUSE_SYSTEM_FFMPEG=ON -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
 
 FROM archlinux AS rpcs3-new 
-RUN pacman -Syu 
-RUN pacman -S glew openal cmake vulkan-validation-layers qt6-base qt6-declarative qt6-multimedia qt6-svg sdl2 sndio jack2 base-devel
+RUN pacman -Syu --noconfirm
+RUN pacman -S --noconfirm glew openal cmake vulkan-validation-layers qt6-base qt6-declarative qt6-multimedia qt6-svg sdl2 sndio jack2 base-devel git
 
 ADD https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
@@ -272,7 +272,10 @@ libfreeimage-dev \
 libavfilter-dev \
 libgit2-dev \
 libxcb-cursor0 \
-libxcb-cursor-dev
+libxcb-cursor-dev \
+gettext \
+libharfbuzz-dev \
+libicu-dev
 
 # RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install pdftotext
 
@@ -284,7 +287,7 @@ libxcb-cursor-dev
   RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
   # RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
   #   cd/ /rpcs3_build/ && make install
-  COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
+  COPY --from=rpcs3-new /rpcs3_build/bin/ /rpcs3/
   ENV PATH=$PATH:/rpcs3
   ENV LD_LIBRARY_PATH=/usr/local/Qt-6.6.3/lib:$LD_LIBRARY_PATH
   
@@ -417,7 +420,10 @@ libfreeimage-dev \
 libavfilter-dev \
 libgit2-dev \
 libxcb-cursor0 \
-libxcb-cursor-dev
+libxcb-cursor-dev \
+gettext \
+libharfbuzz-dev \
+libicu-dev
 
   
   # RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install pdftotext
@@ -430,7 +436,7 @@ libxcb-cursor-dev
     RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
     # RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
     #   cd/ /rpcs3_build/ && make install
-    COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
+    COPY --from=rpcs3-new /rpcs3_build/bin/ /rpcs3/
     ENV PATH=$PATH:/rpcs3
     
     #ESDE
