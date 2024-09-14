@@ -145,6 +145,30 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   RUN mkdir qt6_build && cd qt6_build && ../configure && cmake --build . --parallel $(nproc) 
   #&& cmake --install .
 
+FROM ubuntu:jammy as base-sdl
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+--mount=type=cache,target=/var/lib/apt,sharing=locked \
+apt update && apt-get --no-install-recommends install -y \
+build-essential git make \
+pkg-config cmake ninja-build gnome-desktop-testing libasound2-dev libpulse-dev \
+libaudio-dev libjack-dev libsndio-dev libx11-dev libxext-dev \
+libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev \
+libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
+libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev
+ADD https://github.com/libsdl-org/SDL.git /sdl
+run cmake -S /sdl -B /build &&\
+  cmake --build /build -j$(nproc)
+
+FROM ubuntu:jammy as base-openal
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+--mount=type=cache,target=/var/lib/apt,sharing=locked \
+apt update && apt-get --no-install-recommends install -y \
+build-essential cmake python3-pip 
+RUN apt remove -y cmake
+RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install cmake 
+ADD https://github.com/kcat/openal-soft.git /openal
+RUN cd /openal/build && cmake .. && cmake --build . 
+
   # ===================================================
   # =       ===       =====     ====      ======   ====
   # =  ====  ==  ====  ===  ===  ==  ====  ===   =   ==
@@ -167,21 +191,27 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt-get --no-install-recommends install -y \
-  wget ca-certificates ffmpeg
+  wget ca-certificates software-properties-common gpg-agent
   RUN  wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | tee /etc/apt/trusted.gpg.d/lunarg.asc
   ADD https://packages.lunarg.com/vulkan/1.3.283/lunarg-vulkan-1.3.283-jammy.list /etc/apt/sources.list.d/lunarg-vulkan-1.3.283-jammy.list 
-  RUN apt remove cmake qt6-base-private-dev libqt6svg6-dev -y
+  RUN apt remove -y cmake qt6-base-private-dev libqt6svg6-dev libopenal-dev
+  run add-apt-repository -y ppa:ubuntu-toolchain-r/test
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt-get --no-install-recommends install -y \
-  python3-pip vulkan-sdk gcc-11
+  python3-pip vulkan-sdk gcc-13 g++-13
   RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install cmake 
-  ENV CXX=g++-11 
-  ENV CC=gcc-11
+  ENV CXX=g++-13 
+  ENV CC=gcc-13
   WORKDIR /
+  run --mount=type=bind,from=base-sdl,source=/build,target=/build,rw \
+  --mount=type=bind,from=base-sdl,source=/sdl,target=/sdl,rw \
+  cmake --install /build --prefix /usr/local
+  run --mount=type=bind,from=base-openal,source=/openal,target=/openal,rw \
+  cd /openal/build && make install -j$(nproc)
   ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
+  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO  ../rpcs3/ && make -j$(nproc)
 
 FROM archlinux AS rpcs3-new 
 RUN pacman -Syu --noconfirm
@@ -189,7 +219,7 @@ RUN pacman -S --noconfirm glew openal cmake vulkan-validation-layers qt6-base qt
 
 ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on ../rpcs3/ && make -j$(nproc)
+  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO ../rpcs3/ && make -j$(nproc)
 
 # ==================================================
 # =        ===      =============       ===        =
@@ -436,13 +466,21 @@ libicu-dev
     RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
     # RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
     #   cd/ /rpcs3_build/ && make install
-    COPY --from=rpcs3-new /rpcs3_build/bin/ /rpcs3/
+    COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
     ENV PATH=$PATH:/rpcs3
     
     #ESDE
     RUN --mount=type=bind,from=esde,source=/build,target=/build,rw \
       --mount=type=bind,from=esde,source=/esde,target=/esde,rw \
       cd /build && make install
+
+
+  run add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+  RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+  --mount=type=cache,target=/var/lib/apt,sharing=locked \
+  apt update && apt-get --no-install-recommends install -y \
+  libstdc++6
     
     ######### End Customizations ###########
     
