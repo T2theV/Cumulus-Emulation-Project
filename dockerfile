@@ -58,7 +58,13 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   ca-certificates \
   gettext \
   libharfbuzz-dev \
-  libicu-dev
+  libicu-dev \
+  ccache
+
+
+  RUN ccache -M 0 --set-config=compiler_check=content --set-config=sloppiness=include_file_ctime,include_file_mtime
+
+
 
  
 # ===================================================================================
@@ -75,9 +81,16 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   
   #Dolphin build
   FROM build-base01 AS dolphinemu
+  ENV timothy=1
   ADD https://github.com/dolphin-emu/dolphin.git /dolphin
   WORKDIR /dolphin
-  RUN mkdir build && cd build && cmake .. && make -j$(nproc)
+  
+  RUN ccache -M 0 --set-config=compiler_check=content
+
+  RUN --mount=type=cache,id=dolphincache,target=/root/.cache/ccache \
+    mkdir build && cd build && cmake -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache .. && make -j$(nproc) \
+  
+  && ccache -p && ccache -s
 
  
   
@@ -134,7 +147,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   python3 \
   ninja-build \
   libdrm-dev \
-  libgles2-mesa-dev 
+  libgles2-mesa-dev \
+  ccache
 
   WORKDIR /
   #download and extract
@@ -142,10 +156,16 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   RUN tar xf qt.tar.xz
   #install
   WORKDIR /qt-everywhere-src-6.6.3
-  RUN mkdir qt6_build && cd qt6_build && ../configure && cmake --build . --parallel $(nproc) 
-  #&& cmake --install .
+  ENV CMAKE_C_COMPILER_LAUNCHER=ccache
+  ENV CMAKE_CXX_COMPILER_LAUNCHER=ccache
+  ENV TIM=1
+  RUN ccache -M 0 --set-config=compiler_check=content
+  RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
+    mkdir qt6_build && cd qt6_build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc) \
+    && ccache -s
+    #&& cmake --install .c
 
-FROM ubuntu:jammy as base-sdl
+FROM ubuntu:jammy AS base-sdl
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 --mount=type=cache,target=/var/lib/apt,sharing=locked \
 apt update && apt-get --no-install-recommends install -y \
@@ -156,10 +176,10 @@ libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev \
 libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
 libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev
 ADD https://github.com/libsdl-org/SDL.git /sdl
-run cmake -S /sdl -B /build &&\
+RUN cmake -S /sdl -B /build &&\
   cmake --build /build -j$(nproc)
 
-FROM ubuntu:jammy as base-openal
+FROM ubuntu:jammy AS base-openal
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 --mount=type=cache,target=/var/lib/apt,sharing=locked \
 apt update && apt-get --no-install-recommends install -y \
@@ -195,7 +215,7 @@ RUN cd /openal/build && cmake .. && cmake --build .
   RUN  wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | tee /etc/apt/trusted.gpg.d/lunarg.asc
   ADD https://packages.lunarg.com/vulkan/1.3.283/lunarg-vulkan-1.3.283-jammy.list /etc/apt/sources.list.d/lunarg-vulkan-1.3.283-jammy.list 
   RUN apt remove -y cmake qt6-base-private-dev libqt6svg6-dev libopenal-dev
-  run add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt-get --no-install-recommends install -y \
@@ -204,10 +224,10 @@ RUN cd /openal/build && cmake .. && cmake --build .
   ENV CXX=g++-13 
   ENV CC=gcc-13
   WORKDIR /
-  run --mount=type=bind,from=base-sdl,source=/build,target=/build,rw \
+  RUN --mount=type=bind,from=base-sdl,source=/build,target=/build,rw \
   --mount=type=bind,from=base-sdl,source=/sdl,target=/sdl,rw \
   cmake --install /build --prefix /usr/local
-  run --mount=type=bind,from=base-openal,source=/openal,target=/openal,rw \
+  RUN --mount=type=bind,from=base-openal,source=/openal,target=/openal,rw \
   cd /openal/build && make install -j$(nproc)
   ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
@@ -252,7 +272,7 @@ ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   # ============================================================================
                          
   # Final Image Generation
-  FROM kasmweb/core-ubuntu-jammy:1.15.0 as kasm-emulation
+  FROM kasmweb/core-ubuntu-jammy:1.15.0 AS kasm-emulation
   USER root
   
   ENV HOME /home/kasm-default-profile
@@ -475,7 +495,7 @@ libicu-dev
       cd /build && make install
 
 
-  run add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
