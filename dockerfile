@@ -193,7 +193,7 @@ RUN cd /openal/build && cmake .. && cmake --build .
   ENV TZ="Etc/UTC" 
   #mount and install qt
   # RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd qt-everywhere-src-6.6.3/qt6_build && cmake --install .
-  RUN --mount=type=bind,from=qt-package-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
+  RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
   WORKDIR /
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
