@@ -99,7 +99,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   
   #Qt build and install
   FROM debian AS qt-base
-  #install dependencies
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt-get --no-install-recommends install -y \
@@ -134,16 +133,23 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   python3 \
   ninja-build \
   libdrm-dev \
-  libgles2-mesa-dev 
+  libgles2-mesa-dev \
+  ccache \
+  perl \
+  git \
+  ca-certificates 
+
+  RUN ccache -M 0 --set-config=compiler_check=content
 
   WORKDIR /
   #download and extract
-  ADD https://download.qt.io/archive/qt/6.6/6.6.3/single/qt-everywhere-src-6.6.3.tar.xz /qt.tar.xz
-  RUN tar xf qt.tar.xz
-  #install
-  WORKDIR /qt-everywhere-src-6.6.3
-  RUN mkdir qt6_build && cd qt6_build && ../configure && cmake --build . --parallel $(nproc) 
-  #&& cmake --install .
+  RUN git clone --depth 1 --branch v6.6.3 https://code.qt.io/qt/qt5.git /qt6
+  WORKDIR /qt6
+  RUN perl init-repository --module-subset=qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools
+  RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
+    mkdir qt6-build && cd qt6-build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc) \
+    && cmake --install .
+    # && ccache -s
 
 FROM ubuntu:jammy as base-sdl
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -186,7 +192,8 @@ RUN cd /openal/build && cmake .. && cmake --build .
   ENV DEBIAN_FRONTEND=noninteractive 
   ENV TZ="Etc/UTC" 
   #mount and install qt
-  RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd qt-everywhere-src-6.6.3/qt6_build && cmake --install .
+  # RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd qt-everywhere-src-6.6.3/qt6_build && cmake --install .
+  RUN --mount=type=bind,from=qt-package-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
   WORKDIR /
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
