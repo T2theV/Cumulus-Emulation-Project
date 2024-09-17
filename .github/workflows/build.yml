@@ -3,9 +3,9 @@
 name: Build
 
 # Controls when the workflow will run
-on: workflow_dispatch
-  # pull_request:
-  #   branches: [ "main" ]
+on:
+   pull_request:
+     branches: [ "main" ]
 
   # Allows you to run this workflow manually from the Actions tab
   
