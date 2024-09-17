@@ -58,8 +58,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   # WORKDIR /llvm
   # RUN cmake -S llvm -B build -G "Unix Makefiles" -D CMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_BUILD_TYPE=Release && cd build && make -j $(nproc) && make install
   #Qt build and install
-  from debian as qt-base
-  #install dependencies
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt-get --no-install-recommends install -y \
@@ -94,16 +92,23 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   python3 \
   ninja-build \
   libdrm-dev \
-  libgles2-mesa-dev 
+  libgles2-mesa-dev \
+  ccache \
+  perl \
+  git \
+  ca-certificates 
+
+  RUN ccache -M 0 --set-config=compiler_check=content
 
   WORKDIR /
   #download and extract
-  ADD https://download.qt.io/archive/qt/6.6/6.6.3/single/qt-everywhere-src-6.6.3.tar.xz /qt.tar.xz
-  RUN tar xf qt.tar.xz
-  #install
-  WORKDIR /qt-everywhere-src-6.6.3
-  RUN mkdir qt6_build && cd qt6_build && ../configure && cmake --build . --parallel $(nproc) 
-  #&& cmake --install .
+  RUN git clone --depth 1 --branch v6.6.3 https://code.qt.io/qt/qt5.git /qt6
+  WORKDIR /qt6
+  RUN perl init-repository --module-subset=qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools
+  RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
+    mkdir qt6-build && cd qt6-build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc) \
+    && cmake --install .
+    # && ccache -s
 
   #RCPS3 install
   FROM build-base01 as rpcs3
