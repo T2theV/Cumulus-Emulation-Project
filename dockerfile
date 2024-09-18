@@ -99,10 +99,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   
   #Qt build and install
   FROM debian AS qt-base
-<<<<<<< Start-build-workflow
-=======
   #install dependencies
->>>>>>> main
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt-get --no-install-recommends install -y \
@@ -137,7 +134,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   python3 \
   ninja-build \
   libdrm-dev \
-<<<<<<< Start-build-workflow
   libgles2-mesa-dev \
   ccache \
   perl \
@@ -145,9 +141,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   ca-certificates 
 
   RUN ccache -M 0 --set-config=compiler_check=content
-=======
-  libgles2-mesa-dev 
->>>>>>> main
 
   WORKDIR /
   #download and extract
@@ -183,8 +176,6 @@ RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install cmake
 ADD https://github.com/kcat/openal-soft.git /openal
 RUN cd /openal/build && cmake .. && cmake --build . 
 
-<<<<<<< Start-build-workflow
-=======
 FROM ubuntu:jammy as base-sdl
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -209,7 +200,6 @@ RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install cmake
 ADD https://github.com/kcat/openal-soft.git /openal
 RUN cd /openal/build && cmake .. && cmake --build . 
 
->>>>>>> main
   # ===================================================
   # =       ===       =====     ====      ======   ====
   # =  ====  ==  ====  ===  ===  ==  ====  ===   =   ==
@@ -254,17 +244,6 @@ RUN cd /openal/build && cmake .. && cmake --build .
   ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
   cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO  ../rpcs3/ && make -j$(nproc)
-
-<<<<<<< Start-build-workflow
-=======
-FROM archlinux AS rpcs3-new 
-RUN pacman -Syu --noconfirm
-RUN pacman -S --noconfirm glew openal cmake vulkan-validation-layers qt6-base qt6-declarative qt6-multimedia qt6-svg sdl2 sndio jack2 base-devel git
-
-ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
-  RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO ../rpcs3/ && make -j$(nproc)
->>>>>>> main
 
 # ==================================================
 # =        ===      =============       ===        =
@@ -362,11 +341,7 @@ libicu-dev
   RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
   # RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
   #   cd/ /rpcs3_build/ && make install
-<<<<<<< Start-build-workflow
   COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
-=======
-  COPY --from=rpcs3-new /rpcs3_build/bin/ /rpcs3/
->>>>>>> main
   ENV PATH=$PATH:/rpcs3
   ENV LD_LIBRARY_PATH=/usr/local/Qt-6.6.3/lib:$LD_LIBRARY_PATH
   
