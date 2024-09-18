@@ -134,16 +134,47 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   python3 \
   ninja-build \
   libdrm-dev \
-  libgles2-mesa-dev 
+  libgles2-mesa-dev \
+  ccache \
+  perl \
+  git \
+  ca-certificates 
+
+  RUN ccache -M 0 --set-config=compiler_check=content
 
   WORKDIR /
   #download and extract
-  ADD https://download.qt.io/archive/qt/6.6/6.6.3/single/qt-everywhere-src-6.6.3.tar.xz /qt.tar.xz
-  RUN tar xf qt.tar.xz
-  #install
-  WORKDIR /qt-everywhere-src-6.6.3
-  RUN mkdir qt6_build && cd qt6_build && ../configure && cmake --build . --parallel $(nproc) 
-  #&& cmake --install .
+  RUN git clone --depth 1 --branch v6.6.3 https://code.qt.io/qt/qt5.git /qt6
+  WORKDIR /qt6
+  RUN perl init-repository --module-subset=qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools
+  RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
+    mkdir qt6-build && cd qt6-build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc) \
+    && cmake --install .
+    # && ccache -s
+
+FROM ubuntu:jammy as base-sdl
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+--mount=type=cache,target=/var/lib/apt,sharing=locked \
+apt update && apt-get --no-install-recommends install -y \
+build-essential git make \
+pkg-config cmake ninja-build gnome-desktop-testing libasound2-dev libpulse-dev \
+libaudio-dev libjack-dev libsndio-dev libx11-dev libxext-dev \
+libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev \
+libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
+libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev
+ADD https://github.com/libsdl-org/SDL.git /sdl
+run cmake -S /sdl -B /build &&\
+  cmake --build /build -j$(nproc)
+
+FROM ubuntu:jammy as base-openal
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+--mount=type=cache,target=/var/lib/apt,sharing=locked \
+apt update && apt-get --no-install-recommends install -y \
+build-essential cmake python3-pip 
+RUN apt remove -y cmake
+RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install cmake 
+ADD https://github.com/kcat/openal-soft.git /openal
+RUN cd /openal/build && cmake .. && cmake --build . 
 
 FROM ubuntu:jammy as base-sdl
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -186,7 +217,8 @@ RUN cd /openal/build && cmake .. && cmake --build .
   ENV DEBIAN_FRONTEND=noninteractive 
   ENV TZ="Etc/UTC" 
   #mount and install qt
-  RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd qt-everywhere-src-6.6.3/qt6_build && cmake --install .
+  # RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd qt-everywhere-src-6.6.3/qt6_build && cmake --install .
+  RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
   WORKDIR /
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -212,14 +244,6 @@ RUN cd /openal/build && cmake .. && cmake --build .
   ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
   cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO  ../rpcs3/ && make -j$(nproc)
-
-FROM archlinux AS rpcs3-new 
-RUN pacman -Syu --noconfirm
-RUN pacman -S --noconfirm glew openal cmake vulkan-validation-layers qt6-base qt6-declarative qt6-multimedia qt6-svg sdl2 sndio jack2 base-devel git
-
-ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
-  RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO ../rpcs3/ && make -j$(nproc)
 
 # ==================================================
 # =        ===      =============       ===        =
@@ -317,7 +341,7 @@ libicu-dev
   RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
   # RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
   #   cd/ /rpcs3_build/ && make install
-  COPY --from=rpcs3-new /rpcs3_build/bin/ /rpcs3/
+  COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
   ENV PATH=$PATH:/rpcs3
   ENV LD_LIBRARY_PATH=/usr/local/Qt-6.6.3/lib:$LD_LIBRARY_PATH
   
