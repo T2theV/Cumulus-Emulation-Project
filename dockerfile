@@ -150,31 +150,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
     mkdir qt6-build && cd qt6-build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc) \
     && cmake --install .
-    # && ccache -s
-
-FROM ubuntu:jammy as base-sdl
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
---mount=type=cache,target=/var/lib/apt,sharing=locked \
-apt update && apt-get --no-install-recommends install -y \
-build-essential git make \
-pkg-config cmake ninja-build gnome-desktop-testing libasound2-dev libpulse-dev \
-libaudio-dev libjack-dev libsndio-dev libx11-dev libxext-dev \
-libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev \
-libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev \
-libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev
-ADD https://github.com/libsdl-org/SDL.git /sdl
-run cmake -S /sdl -B /build &&\
-  cmake --build /build -j$(nproc)
-
-FROM ubuntu:jammy as base-openal
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
---mount=type=cache,target=/var/lib/apt,sharing=locked \
-apt update && apt-get --no-install-recommends install -y \
-build-essential cmake python3-pip 
-RUN apt remove -y cmake
-RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install cmake 
-ADD https://github.com/kcat/openal-soft.git /openal
-RUN cd /openal/build && cmake .. && cmake --build . 
+    # && ccache -s 
 
 FROM ubuntu:jammy as base-sdl
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
