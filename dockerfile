@@ -148,9 +148,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   WORKDIR /qt6
   RUN perl init-repository --module-subset=qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools
   RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
-    mkdir qt6-build && cd qt6-build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc) \
-    && cmake --install .
-    # && ccache -s 
+    mkdir qt6-build && cd qt6-build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc) 
 
 FROM ubuntu:jammy as base-sdl
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -463,7 +461,8 @@ libicu-dev
       cd /dolphin/build && make install
   
     #RCPS3 
-    RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
+    # RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
+    RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
     # RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
     #   cd/ /rpcs3_build/ && make install
     COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
