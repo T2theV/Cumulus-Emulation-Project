@@ -495,9 +495,7 @@ libicu-dev
   # =  ====  ==  =  ==  =  ==  =  ==  =  ==  ==  =  ==  =  =
   # ==      ====    ==  =  ===   ===  =  ==  ==  =  ===   ==
   # ========================================================
-ARG SUNSHINE_VERSION=latest
-ARG SUNSHINE_OS=ubuntu-22.04
-FROM lizardbyte/sunshine:${SUNSHINE_VERSION}-${SUNSHINE_OS} AS sunshine
+FROM lizardbyte/sunshine:latest-ubuntu-24.04 AS sunshine
 
     RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
