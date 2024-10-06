@@ -497,9 +497,11 @@ libicu-dev
   # ========================================================
 FROM lizardbyte/sunshine:latest-ubuntu-24.04 AS sunshine
 
+ENV DEBIAN_FRONTEND=noninteractive
+USER root
     RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt update && apt-get --no-install-recommends install -y \
+    apt update && apt --no-install-recommends install -y \
     build-essential \
     git \
     cmake \
@@ -526,7 +528,6 @@ FROM lizardbyte/sunshine:latest-ubuntu-24.04 AS sunshine
     libedit-dev \
     libvulkan-dev \
     libudev-dev \
-    libsdl2-2.0 \
     libsdl2-dev \
     libjack-dev \
     libsndio-dev \
@@ -546,4 +547,5 @@ FROM lizardbyte/sunshine:latest-ubuntu-24.04 AS sunshine
   RUN --mount=type=bind,from=dolphinemu,source=/dolphin,target=/dolphin,rw \
   cd /dolphin/build && make install
 
+  USER lizard
   ENTRYPOINT dolphin && sunshine
