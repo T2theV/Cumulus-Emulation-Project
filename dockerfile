@@ -504,7 +504,6 @@ USER root
     apt update && apt --no-install-recommends install -y \
     build-essential \
     git \
-    cmake \
     ffmpeg \
     libavcodec-dev \
     libavformat-dev \
@@ -528,17 +527,19 @@ USER root
     libedit-dev \
     libvulkan-dev \
     libudev-dev \
+    libsdl2-2.0-0 \
     libsdl2-dev \
     libjack-dev \
     libsndio-dev \
-    clang-format \
-    libavfilter-dev \
-    libfreeimage-dev \
-    libfreetype6-dev \
-    libgit2-dev \
+    cmake \
+    libmbedtls-dev \
     libpugixml-dev \
     libpoppler-cpp-dev \
-    ca-certificates \
+    libfreeimage-dev \
+    libavfilter-dev \
+    libgit2-dev \
+    libxcb-cursor0 \
+    libxcb-cursor-dev \
     gettext \
     libharfbuzz-dev \
     libicu-dev
