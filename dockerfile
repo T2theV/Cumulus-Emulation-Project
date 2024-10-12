@@ -549,4 +549,4 @@ USER root
   cd /dolphin/build && make install
 
   USER lizard
-  ENTRYPOINT dolphin && sunshine
+  ENTRYPOINT dolphin-emu && sunshine
