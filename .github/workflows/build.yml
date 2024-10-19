@@ -31,13 +31,13 @@ jobs:
         with:
           push: false
           target: dolphin-dist
-          name: dolphin-build
+          tags: dolphin-build
           outputs: type=docker,dest=/tmp/dolphin-build.tar
         
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-build.tar
+          name: dolphin-build
           path: /tmp/dolphin-build.tar
 
   build-webtop:
