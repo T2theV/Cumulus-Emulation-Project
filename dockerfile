@@ -79,6 +79,9 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   WORKDIR /dolphin
   RUN mkdir build && cd build && cmake .. && make -j$(nproc)
 
+  FROM scratch AS dolphin-dist
+  COPY --from=dolphinemu /dolphin .
+
  
   
   # ADD https://github.com/llvm/llvm-project.git#llvmorg-17.0.1 /llvm
@@ -457,21 +460,21 @@ libicu-dev
   # RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install pdftotext
   
     # Dolphin Emulator
-    RUN --mount=type=bind,from=dolphinemu,source=/dolphin,target=/dolphin,rw \
+    RUN --mount=type=bind,from=dolphin-dist,source=/,target=/dolphin,rw \
       cd /dolphin/build && make install
   
     #RCPS3 
     # RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
-    RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
+    # RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
     # RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
     #   cd/ /rpcs3_build/ && make install
-    COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
-    ENV PATH=$PATH:/rpcs3
+    # COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
+    # ENV PATH=$PATH:/rpcs3
     
     #ESDE
-    RUN --mount=type=bind,from=esde,source=/build,target=/build,rw \
-      --mount=type=bind,from=esde,source=/esde,target=/esde,rw \
-      cd /build && make install
+    # RUN --mount=type=bind,from=esde,source=/build,target=/build,rw \
+    #   --mount=type=bind,from=esde,source=/esde,target=/esde,rw \
+    #   cd /build && make install
 
 
   run add-apt-repository -y ppa:ubuntu-toolchain-r/test
