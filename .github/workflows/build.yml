@@ -72,4 +72,5 @@ jobs:
           push: false
           target: webtop-emulation
           file: webtop.dockerfile
+          build-contexts: dolphin-dist=dolphin-build
           
