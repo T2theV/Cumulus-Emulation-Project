@@ -39,7 +39,7 @@ jobs:
           push: false
           target: dolphin-dist
           tags: dolphin-build
-          outputs: type=docker,dest=/tmp/dolphin-build.tar
+          outputs: type=local,dest=/tmp/dolphin-build
           cache-from: ghcr.io/t2thev/bkcache
           cache-to: ghcr.io/t2thev/bkcache
         
@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dolphin-build
-          path: /tmp/dolphin-build.tar
+          path: /tmp/dolphin-build/
 
   build-webtop:
     runs-on: ubuntu-latest
@@ -59,7 +59,7 @@ jobs:
           name: dolphin-build
           path: /tmp
       
-      - name: Load image
+      - name: unzip image
         run: |
           docker load --input /tmp/dolphin-build.tar
       
@@ -72,5 +72,5 @@ jobs:
           push: false
           target: webtop-emulation
           file: webtop.dockerfile
-          build-contexts: dolphin-dist=/tmp/dolphin-build.tar
+          build-contexts: dolphin-dist=/tmp/dolphin-build
           
