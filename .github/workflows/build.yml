@@ -61,7 +61,7 @@ jobs:
       
       - name: unzip image
         run: |
-          tar -xvf /tmp/dolphin-build.tar
+          tar -xvf /tmp/dolphin-build.tar -C dolphin-build
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
