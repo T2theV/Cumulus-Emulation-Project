@@ -61,6 +61,7 @@ jobs:
       
       - name: unzip image
         run: |
+          mkdir dolphin-build
           tar -xvf /tmp/dolphin-build.tar -C dolphin-build
       
       - name: Set up Docker Buildx
@@ -72,5 +73,5 @@ jobs:
           push: false
           target: webtop-emulation
           file: webtop.dockerfile
-          build-contexts: dolphin-dist=/tmp/dolphin-build
+          build-contexts: dolphin-dist=dolphin-build
           
