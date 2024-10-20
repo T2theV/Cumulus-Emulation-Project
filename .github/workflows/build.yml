@@ -39,7 +39,7 @@ jobs:
           push: false
           target: dolphin-dist
           tags: dolphin-build
-          outputs: type=local,dest=/tmp/dolphin-build
+          outputs: type=tar,dest=/tmp/dolphin-build.tar
           cache-from: ghcr.io/t2thev/bkcache
           cache-to: ghcr.io/t2thev/bkcache
         
@@ -47,7 +47,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dolphin-build
-          path: /tmp/dolphin-build/
+          path: /tmp/dolphin-build.tar
 
   build-webtop:
     runs-on: ubuntu-latest
@@ -56,12 +56,12 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: dolphin-build
+          name: dolphin-build.tar
           path: /tmp
       
       - name: unzip image
         run: |
-          docker load --input /tmp/dolphin-build.tar
+          tar -xvf /tmp/dolphin-build.tar
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
