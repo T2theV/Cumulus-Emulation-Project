@@ -42,6 +42,7 @@ jobs:
           outputs: type=docker,dest=/tmp/dolphin-build.tar
           cache-from: ghcr.io/t2thev/bkcache
           cache-to: ghcr.io/t2thev/bkcache
+          file: progs/emulators/dolphin.dockerfile
         
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -86,9 +87,7 @@ jobs:
         with:
           push: true
           target: webtop-emulation
-          file: webtop.dockerfile
+          file: images/webtop.dockerfile
           build-contexts: dolphin-dist=docker-image://dolphin-build
           tags: ghcr.io/t2thev/esde-docker:webtop-nightly
-          # cache-from: ghcr.io/t2thev/bkcache-webtop
-          # cache-to: ghcr.io/t2thev/bkcache-webtop
           
