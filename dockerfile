@@ -61,7 +61,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   libicu-dev \
   ccache
 
-
   RUN ccache -M 0 --set-config=compiler_check=content --set-config=sloppiness=include_file_ctime,include_file_mtime
 
 
@@ -81,16 +80,11 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   
   #Dolphin build
   FROM build-base01 AS dolphinemu
-  ENV timothy=1
   ADD https://github.com/dolphin-emu/dolphin.git /dolphin
   WORKDIR /dolphin
   
-  RUN ccache -M 0 --set-config=compiler_check=content
-
   RUN --mount=type=cache,id=dolphincache,target=/root/.cache/ccache \
-    mkdir build && cd build && cmake -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache .. && make -j$(nproc) \
-  
-  && ccache -p && ccache -s
+    mkdir build && cd build && cmake -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache .. && make -j$(nproc)
 
  
   
@@ -156,14 +150,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   RUN tar xf qt.tar.xz
   #install
   WORKDIR /qt-everywhere-src-6.6.3
-  ENV CMAKE_C_COMPILER_LAUNCHER=ccache
-  ENV CMAKE_CXX_COMPILER_LAUNCHER=ccache
-  ENV TIM=1
-  RUN ccache -M 0 --set-config=compiler_check=content
   RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
-    mkdir qt6_build && cd qt6_build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc) \
-    && ccache -s
-    #&& cmake --install .c
+    mkdir qt6_build && cd qt6_build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc)
 
 FROM ubuntu:jammy AS base-sdl
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
@@ -230,16 +218,9 @@ RUN cd /openal/build && cmake .. && cmake --build .
   RUN --mount=type=bind,from=base-openal,source=/openal,target=/openal,rw \
   cd /openal/build && make install -j$(nproc)
   ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
-  RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO  ../rpcs3/ && make -j$(nproc)
-
-FROM archlinux AS rpcs3-new 
-RUN pacman -Syu --noconfirm
-RUN pacman -S --noconfirm glew openal cmake vulkan-validation-layers qt6-base qt6-declarative qt6-multimedia qt6-svg sdl2 sndio jack2 base-devel git
-
-ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
-  RUN mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO ../rpcs3/ && make -j$(nproc)
+  RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
+  mkdir --parents rpcs3_build && cd rpcs3_build && \
+  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache ../rpcs3/ && make -j$(nproc)
 
 # ==================================================
 # =        ===      =============       ===        =
@@ -257,7 +238,8 @@ ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   FROM build-base01 AS esde
   WORKDIR /
   RUN git clone https://gitlab.com/es-de/emulationstation-de.git --depth=1 esde
-  RUN mkdir build && cd build && cmake -DAPPLICATION_UPDATER=off -DDEINIT_ON_LAUNCH=on ../esde && make -j$(nrpoc)
+  RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
+  mkdir build && cd build && cmake -DAPPLICATION_UPDATER=off -DDEINIT_ON_LAUNCH=on -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache ../esde && make -j$(nrpoc)
 
   # ============================================================================
   # =  ====  ===============================    ================================
