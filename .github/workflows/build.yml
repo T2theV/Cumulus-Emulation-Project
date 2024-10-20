@@ -39,7 +39,7 @@ jobs:
           push: false
           target: dolphin-dist
           tags: dolphin-build
-          outputs: type=tar,dest=/tmp/dolphin-build.tar
+          outputs: type=docker,dest=/tmp/dolphin-build.tar
           cache-from: ghcr.io/t2thev/bkcache
           cache-to: ghcr.io/t2thev/bkcache
         
@@ -59,10 +59,14 @@ jobs:
           name: dolphin-build.tar
           path: /tmp
       
-      - name: unzip image
+      # - name: unzip image
+      #   run: |
+      #     mkdir dolphin-build
+      #     tar -xvf /tmp/dolphin-build.tar -C dolphin-build
+      - name: Load image
         run: |
-          mkdir dolphin-build
-          tar -xvf /tmp/dolphin-build.tar -C dolphin-build
+          docker load --input /tmp/dolphin-build.tar
+          docker image ls -a         
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -80,7 +84,7 @@ jobs:
           push: true
           target: webtop-emulation
           file: webtop.dockerfile
-          build-contexts: dolphin-dist=dolphin-build
+          build-contexts: dolphin-dist=docker-image://dolphin-build
           tags: ghcr.io/t2thev/esde-docker:webtop-nightly
           cache-from: ghcr.io/t2thev/bkcache-webtop
           cache-to: ghcr.io/t2thev/bkcache-webtop

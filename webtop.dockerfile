@@ -18,7 +18,7 @@
   ARG VERSION
   LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
   LABEL maintainer="thelamer"
-  LABEL org.opencontainers.image.source=https://github.com/T2theV/ESDE-Docker
+  LABEL org.opencontainers.image.source https://github.com/T2theV/ESDE-Docker
   
   # title
   ENV TITLE="ESDE"
