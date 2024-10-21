@@ -111,7 +111,7 @@ jobs:
           outputs: type=docker,dest=/tmp/esde-build.tar
           cache-from: ghcr.io/t2thev/bkesde
           cache-to: ghcr.io/t2thev/bkesde
-          file: progs/emulators/esde.dockerfile
+          file: progs/emulators/es-de.dockerfile
           build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
       - name: Upload artifact
