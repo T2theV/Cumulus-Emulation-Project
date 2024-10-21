@@ -42,10 +42,10 @@ jobs:
           cache-from: ghcr.io/t2thev/bkcache
           cache-to: ghcr.io/t2thev/bkcache
           file: progs/dependencies/buildbase.dockerfile
-          build-contexts: build-base01=ghcr.io/T2theV/emubuilder
 
   # This workflow contains a single job called "build"
   build-dolphin:
+    needs: build-builder
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -74,6 +74,7 @@ jobs:
           cache-from: ghcr.io/t2thev/bkcache
           cache-to: ghcr.io/t2thev/bkcache
           file: progs/emulators/dolphin.dockerfile
+          build-contexts: build-base01=ghcr.io/T2theV/emubuilder
         
       - name: Upload artifact
         uses: actions/upload-artifact@v4
