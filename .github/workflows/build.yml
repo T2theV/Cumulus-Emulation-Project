@@ -224,7 +224,7 @@ jobs:
           target: kasm-emulation
           file: images/kasm.dockerfile
           build-contexts: |
-            dolphinemu=docker-image://dolphin-build
+            dolphin-dist=docker-image://dolphin-build
             esde=docker-image://esde-build
           tags: ghcr.io/t2thev/esde-docker:kasm-nightly
           

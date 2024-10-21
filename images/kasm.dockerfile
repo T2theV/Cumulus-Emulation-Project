@@ -70,7 +70,7 @@ libicu-dev
 # RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install pdftotext
 
   # Dolphin Emulator
-  RUN --mount=type=bind,from=dolphinemu,source=/dolphin,target=/dolphin,rw \
+  RUN --mount=type=bind,from=dolphin-dist,source=/,target=/dolphin,rw \
     cd /dolphin/build && make install
 
   #RCPS3 
