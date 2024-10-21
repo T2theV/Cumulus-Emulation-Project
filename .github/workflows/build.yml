@@ -38,8 +38,8 @@ jobs:
           push: true
           target: build-base01
           tags: ghcr.io/t2thev/emubuilder
-          cache-from: ghcr.io/t2thev/bkcache
-          cache-to: ghcr.io/t2thev/bkcache
+          cache-from: ghcr.io/t2thev/bkbuilder 
+          cache-to: ghcr.io/t2thev/bkbuilder
           file: progs/dependencies/buildbase.dockerfile
 
   # This workflow contains a single job called "build"
@@ -70,8 +70,8 @@ jobs:
           target: dolphin-dist
           tags: dolphin-build
           outputs: type=docker,dest=/tmp/dolphin-build.tar
-          cache-from: ghcr.io/t2thev/bkcache
-          cache-to: ghcr.io/t2thev/bkcache
+          cache-from: ghcr.io/t2thev/bkdolphin
+          cache-to: ghcr.io/t2thev/bkdolphin
           file: progs/emulators/dolphin.dockerfile
           build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
