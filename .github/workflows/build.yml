@@ -35,7 +35,7 @@ jobs:
       - name: Build & Push Docker Image 
         uses: docker/build-push-action@v5
         with:
-          push: false
+          push: true
           target: build-base01
           tags: ghcr.io/t2thev/emubuilder
           cache-from: ghcr.io/t2thev/bkcache
