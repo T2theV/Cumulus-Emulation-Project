@@ -73,7 +73,7 @@ jobs:
           cache-from: ghcr.io/t2thev/bkcache
           cache-to: ghcr.io/t2thev/bkcache
           file: progs/emulators/dolphin.dockerfile
-          build-contexts: build-base01=ghcr.io/t2thev/emubuilder:latest
+          build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
       - name: Upload artifact
         uses: actions/upload-artifact@v4
