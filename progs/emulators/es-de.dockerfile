@@ -20,3 +20,7 @@
 
   FROM scratch AS esde-dist
   COPY --from=esde /build .
+
+  FROM scratch as esde-dist
+  COPY from=esde /build /build
+  COPY from=esde /esde /esde 
