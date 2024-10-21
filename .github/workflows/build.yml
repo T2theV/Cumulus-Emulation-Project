@@ -169,8 +169,8 @@ jobs:
           push: true
           target: webtop-emulation
           file: images/webtop.dockerfile
-          build-contexts: 
-            - dolphin-dist=docker-image://dolphin-build
-            - esde = docker-image://esde-build
+          build-contexts: |
+            dolphin-dist=docker-image://dolphin-build
+            esde = docker-image://esde-build
           tags: ghcr.io/t2thev/esde-docker:webtop-nightly
           
