@@ -131,9 +131,9 @@
       # ENV PATH=$PATH:/rpcs3
       
       #ESDE
-      # RUN --mount=type=bind,from=esde,source=/build,target=/build,rw \
-      #   --mount=type=bind,from=esde,source=/esde,target=/esde,rw \
-      #   cd /build && make install
+      RUN --mount=type=bind,from=esde,source=/build,target=/build,rw \
+        --mount=type=bind,from=esde,source=/esde,target=/esde,rw \
+        cd /build && make install
   
   
     run add-apt-repository -y ppa:ubuntu-toolchain-r/test
