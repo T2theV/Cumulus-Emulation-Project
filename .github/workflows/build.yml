@@ -122,7 +122,9 @@ jobs:
 
   build-webtop:
     runs-on: ubuntu-latest
-    needs: build-dolphin
+    needs: 
+      - build-dolphin
+      - build-esde
     steps:
       
       - name: Set up Docker Buildx
