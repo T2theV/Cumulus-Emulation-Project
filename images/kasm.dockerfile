@@ -74,12 +74,12 @@ libicu-dev
     cd /dolphin/build && make install
 
   #RCPS3 
-  RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
+  # RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd /qt-everywhere-src-6.6.3/qt6_build && cmake --install .
   # RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
   #   cd/ /rpcs3_build/ && make install
-  COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
-  ENV PATH=$PATH:/rpcs3
-  ENV LD_LIBRARY_PATH=/usr/local/Qt-6.6.3/lib:$LD_LIBRARY_PATH
+  # COPY --from=rpcs3 /rpcs3_build/bin/ /rpcs3/
+  # ENV PATH=$PATH:/rpcs3
+  # ENV LD_LIBRARY_PATH=/usr/local/Qt-6.6.3/lib:$LD_LIBRARY_PATH
   
   ENV ES_DE_CONTAINER_VERSION 0.1-xcb
   
