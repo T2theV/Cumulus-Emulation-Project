@@ -16,7 +16,7 @@
   ADD https://github.com/dolphin-emu/dolphin.git /dolphin
   WORKDIR /dolphin
   
-  RUN --mount=type=cache,id=dolphincache,target=/root/.cache/ccache \
+  RUN --mount=type=cache,target=/root/.cache/ccache/ \
 <<EOT
   mkdir build
   cd build
