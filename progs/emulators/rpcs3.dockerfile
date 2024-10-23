@@ -41,6 +41,6 @@
   RUN --mount=type=bind,from=base-openal,source=/openal,target=/openal,rw \
   cd /openal/build && make install -j$(nproc)
   ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
-  RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
+  RUN --mount=type=cache,target=/root/.cache/ccache \
   mkdir --parents rpcs3_build && cd rpcs3_build && \
   cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache ../rpcs3/ && make -j$(nproc)
