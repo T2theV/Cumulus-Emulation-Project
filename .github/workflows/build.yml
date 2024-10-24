@@ -39,7 +39,7 @@ jobs:
           target: build-base01
           tags: ghcr.io/t2thev/emubuilder
           cache-from: ghcr.io/t2thev/bkbuilder 
-          cache-to: ghcr.io/t2thev/bkbuilder
+          cache-to: ghcr.io/t2thev/bkbuilder,mode=max
           file: progs/dependencies/buildbase.dockerfile
 
   # This workflow contains a single job called "build"
@@ -71,7 +71,7 @@ jobs:
           tags: dolphin-build
           outputs: type=docker,dest=/tmp/dolphin-build.tar
           cache-from: ghcr.io/t2thev/bkdolphin
-          cache-to: ghcr.io/t2thev/bkdolphin
+          cache-to: ghcr.io/t2thev/bkdolphin,mode=max
           file: progs/emulators/dolphin.dockerfile
           build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
@@ -107,7 +107,7 @@ jobs:
           target: openal-dist
           outputs: type=tar,dest=/tmp/openal-build.tar
           cache-from: ghcr.io/t2thev/bkopenal
-          cache-to: ghcr.io/t2thev/bkopenal
+          cache-to: ghcr.io/t2thev/bkopenal,mode=max
           file: progs/dependencies/openal.dockerfile
         
       - name: Upload artifact
@@ -142,7 +142,7 @@ jobs:
           target: sdl-dist
           outputs: type=tar,dest=/tmp/sdl-build.tar
           cache-from: ghcr.io/t2thev/bksdl
-          cache-to: ghcr.io/t2thev/bksdl
+          cache-to: ghcr.io/t2thev/bksdl,mode=max
           file: progs/dependencies/sdl.dockerfile
         
       - name: Upload artifact
@@ -177,7 +177,7 @@ jobs:
           target: qt-dist
           outputs: type=tar,dest=/tmp/qt-build.tar
           cache-from: ghcr.io/t2thev/bkqt
-          cache-to: ghcr.io/t2thev/bkqt
+          cache-to: ghcr.io/t2thev/bkqt,mode=max
           file: progs/dependencies/qt.dockerfile
           build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
@@ -255,7 +255,7 @@ jobs:
           tags: rpcs3-build
           outputs: type=docker,dest=/tmp/rpcs3-build.tar
           cache-from: ghcr.io/t2thev/bkrpcs3
-          cache-to: ghcr.io/t2thev/bkrpcs3
+          cache-to: ghcr.io/t2thev/bkrpcs3,mode=max
           file: progs/emulators/rpcs3.dockerfile
           build-contexts: |
             build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
@@ -299,7 +299,7 @@ jobs:
           tags: esde-build
           outputs: type=docker,dest=/tmp/esde-build.tar
           cache-from: ghcr.io/t2thev/bkesde
-          cache-to: ghcr.io/t2thev/bkesde
+          cache-to: ghcr.io/t2thev/bkesde,mode=max
           file: progs/emulators/es-de.dockerfile
           build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
