@@ -38,8 +38,8 @@ jobs:
           push: true
           target: build-base01
           tags: ghcr.io/t2thev/emubuilder
-          cache-from: ghcr.io/t2thev/bkbuilder 
-          cache-to: ghcr.io/t2thev/bkbuilder,mode=max
+          cache-from: type=registry,ref=ghcr.io/t2thev/bkbuilder 
+          cache-to: type=registry,ref=ghcr.io/t2thev/bkbuilder,mode=max
           file: progs/dependencies/buildbase.dockerfile
 
   # This workflow contains a single job called "build"
@@ -70,8 +70,8 @@ jobs:
           target: dolphin-dist
           tags: dolphin-build
           outputs: type=docker,dest=/tmp/dolphin-build.tar
-          cache-from: ghcr.io/t2thev/bkdolphin
-          cache-to: ghcr.io/t2thev/bkdolphin,mode=max
+          cache-from: type=registry,ref=ghcr.io/t2thev/bkdolphin
+          cache-to: type=registry,ref=ghcr.io/t2thev/bkdolphin,mode=max
           file: progs/emulators/dolphin.dockerfile
           build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
@@ -106,8 +106,8 @@ jobs:
           push: false
           target: openal-dist
           outputs: type=tar,dest=/tmp/openal-build.tar
-          cache-from: ghcr.io/t2thev/bkopenal
-          cache-to: ghcr.io/t2thev/bkopenal,mode=max
+          cache-from: type=registry,ref=ghcr.io/t2thev/bkopenal
+          cache-to: type=registry,ref=ghcr.io/t2thev/bkopenal,mode=max
           file: progs/dependencies/openal.dockerfile
         
       - name: Upload artifact
@@ -141,8 +141,8 @@ jobs:
           push: false
           target: sdl-dist
           outputs: type=tar,dest=/tmp/sdl-build.tar
-          cache-from: ghcr.io/t2thev/bksdl
-          cache-to: ghcr.io/t2thev/bksdl,mode=max
+          cache-from: type=registry,ref=ghcr.io/t2thev/bksdl
+          cache-to: type=registry,ref=ghcr.io/t2thev/bksdl,mode=max
           file: progs/dependencies/sdl.dockerfile
         
       - name: Upload artifact
@@ -176,8 +176,8 @@ jobs:
           push: false
           target: qt-dist
           outputs: type=tar,dest=/tmp/qt-build.tar
-          cache-from: ghcr.io/t2thev/bkqt
-          cache-to: ghcr.io/t2thev/bkqt,mode=max
+          cache-from: type=registry,ref=ghcr.io/t2thev/bkqt
+          cache-to: type=registry,ref=ghcr.io/t2thev/bkqt,mode=max
           file: progs/dependencies/qt.dockerfile
           build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
@@ -254,8 +254,8 @@ jobs:
           target: rpcs3-dist
           tags: rpcs3-build
           outputs: type=docker,dest=/tmp/rpcs3-build.tar
-          cache-from: ghcr.io/t2thev/bkrpcs3
-          cache-to: ghcr.io/t2thev/bkrpcs3,mode=max
+          cache-from: type=registry,ref=ghcr.io/t2thev/bkrpcs3
+          cache-to: type=registry,ref=ghcr.io/t2thev/bkrpcs3,mode=max
           file: progs/emulators/rpcs3.dockerfile
           build-contexts: |
             build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
@@ -298,8 +298,8 @@ jobs:
           target: esde-dist
           tags: esde-build
           outputs: type=docker,dest=/tmp/esde-build.tar
-          cache-from: ghcr.io/t2thev/bkesde
-          cache-to: ghcr.io/t2thev/bkesde,mode=max
+          cache-from: type=registry,ref=ghcr.io/t2thev/bkesde
+          cache-to: type=registry,ref=ghcr.io/t2thev/bkesde,mode=max
           file: progs/emulators/es-de.dockerfile
           build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
