@@ -16,8 +16,8 @@
   ENV DEBIAN_FRONTEND=noninteractive 
   ENV TZ="Etc/UTC" 
   #mount and install qt
-  # RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd qt-everywhere-src-6.6.3/qt6_build && cmake --install .
-  RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
+  RUN --mount=type=bind,from=qt-base,source=/qt-everywhere-src-6.6.3,target=/qt-everywhere-src-6.6.3,rw cd qt-everywhere-src-6.6.3/qt6_build && cmake --install .
+  # RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
   WORKDIR /
   RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -44,3 +44,7 @@
   RUN --mount=type=cache,target=/root/.cache/ccache \
   mkdir --parents rpcs3_build && cd rpcs3_build && \
   cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt-6.6.3/ -DBUILD_LLVM=on -DUSE_NATIVE_INSTRUCTIONS=NO -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache ../rpcs3/ && make -j$(nproc)
+
+  FROM scratch as rpcs3-dist
+  COPY --from=rpcs3 /rpcs3 /rpcs3
+  COPY --from=rpcs3 /rpcs3_build /rpcs3_build

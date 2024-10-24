@@ -13,3 +13,6 @@ libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev fcitx-libs-dev
 ADD https://github.com/libsdl-org/SDL.git /sdl
 RUN cmake -S /sdl -B /build &&\
   cmake --build /build -j$(nproc)
+
+FROM scratch AS sdl-dist
+COPY --from=base-sdl /sdl /sdl
