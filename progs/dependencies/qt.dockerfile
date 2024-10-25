@@ -49,7 +49,8 @@
   ninja-build \
   libdrm-dev \
   libgles2-mesa-dev \
-  ccache
+  ccache \
+  git
 
   WORKDIR /
   #download and extract
