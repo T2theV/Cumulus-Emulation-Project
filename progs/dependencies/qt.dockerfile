@@ -51,15 +51,22 @@
   libgles2-mesa-dev \
   ccache \
   git \
-  ca-certificates
+  ca-certificates \
+  perl
 
   WORKDIR /
   #download and extract
-  RUN git clone --branch v6.6.3 https://code.qt.io/qt/qt5.git /qt
+  RUN git clone --branch v6.7.3 https://code.qt.io/qt/qt5.git /qt
   WORKDIR qt
   #install
   RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
-    mkdir qt6_build && cd qt6_build && ../configure -init-submodules -submodules qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc)
+<<EOT bash
+  perl init-repository --module-subset  qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools  
+  mkdir qt6_build
+  cd qt6_build
+  ../configure -submodules qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
+  cmake --build . --parallel $(nproc)
+EOT
 
   FROM scratch AS qt-dist
   COPY --from=qt-base /qt  .
