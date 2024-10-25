@@ -59,7 +59,7 @@
   WORKDIR qt
   #install
   RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
-    mkdir qt6_build && cd qt6_build && ../configure -submodules qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc)
+    mkdir qt6_build && cd qt6_build && ../configure -init-submodules -submodules qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc)
 
   FROM scratch AS qt-dist
   COPY --from=qt-base /qt  .
