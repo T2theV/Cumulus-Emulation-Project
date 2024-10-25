@@ -55,6 +55,7 @@
   #download and extract
   ADD https://download.qt.io/archive/qt/6.6/6.6.3/single/qt-everywhere-src-6.6.3.tar.xz /qt.tar.xz
   RUN tar xf qt.tar.xz
+RUN rm /qt-everywhere-src-6.6.3.tar.xz
   #install
   WORKDIR /qt-everywhere-src-6.6.3
   RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
