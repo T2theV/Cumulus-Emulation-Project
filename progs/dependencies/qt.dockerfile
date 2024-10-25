@@ -50,7 +50,8 @@
   libdrm-dev \
   libgles2-mesa-dev \
   ccache \
-  git
+  git \
+  ca-certificates
 
   WORKDIR /
   #download and extract
