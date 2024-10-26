@@ -206,7 +206,7 @@ jobs:
           target: qt-dist
           outputs: type=tar,dest=/tmp/qt-build.tar
           cache-from: type=registry,ref=ghcr.io/t2thev/bkqt
-          cache-to: type=registry,ref=ghcr.io/t2thev/bkqt,mode=max
+          cache-to: type=registry,ref=ghcr.io/t2thev/bkqt,mode=min
           file: progs/dependencies/qt.dockerfile
           build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
