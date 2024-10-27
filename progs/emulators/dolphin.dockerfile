@@ -28,3 +28,4 @@ EOT
 
   FROM scratch AS dolphin-dist
   COPY --from=dolphinemu /dolphin/build/ /build/
+  COPY --from=dolphinemu /CMakeLists.txt .
