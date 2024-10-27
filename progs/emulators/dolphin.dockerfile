@@ -27,4 +27,4 @@
 EOT
 
   FROM scratch AS dolphin-dist
-  COPY --from=dolphinemu /dolphin/build/ /dolphin/build/
+  COPY --from=dolphinemu /dolphin/build/ /build/
