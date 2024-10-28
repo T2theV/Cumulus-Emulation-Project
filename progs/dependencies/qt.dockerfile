@@ -66,6 +66,7 @@
   cd qt6_build
   ../configure -submodules qtbase,qtmultimedia,qtdeclarative,qtsvg,qtshadertools -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
   cmake --build . --parallel $(nproc)
+  find . -name "*.o" -type f -delete
 EOT
 
   FROM scratch AS qt-dist
