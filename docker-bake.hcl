@@ -5,6 +5,7 @@ target "default" {
     contexts = {
         dolphin-dist = "target:dolphin-build"
         rpcs3-dist = "target:rpcs3-build"
+        esde-dist = "target:esde-build"
     }
 }
 
@@ -19,6 +20,16 @@ target "default" {
 // =  ===  ===  =  ==  ==  ==  =  =======  ====  ==  ==  =  ===  ==
 // =      =====    ==  ==  ===    =======       ===  ===   ====   =
 // ================================================================
+
+target "esde-build" {
+    context = "."
+    dockerfile = "progs/emulators/es-de.dockerfile"
+    tags = ["esde-build"]
+    contexts = {
+        build-base01 = "target:buildbase"
+    }
+}
+
 target "dolphin-build" {
     context = "."
     dockerfile = "progs/emulators/dolphin.dockerfile"

@@ -18,5 +18,5 @@
   RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
   mkdir build && cd build && cmake -DAPPLICATION_UPDATER=off -DDEINIT_ON_LAUNCH=on -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache ../esde && make -j$(nrpoc)
 
-  FROM scratch AS esde-dist
-  COPY --from=esde /build .
+  # FROM scratch AS esde-dist
+  # COPY --from=esde /build .
