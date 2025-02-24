@@ -53,12 +53,12 @@
 
   WORKDIR /
   #download and extract
-  ADD https://download.qt.io/archive/qt/6.6/6.6.3/single/qt-everywhere-src-6.6.3.tar.xz /qt.tar.xz
-  RUN tar xf qt.tar.xz
+  ADD https://download.qt.io/archive/qt/6.8/6.8.1/single/qt-everywhere-src-6.8.1.tar.xz /qt.tar.xz
+  RUN tar xf qt.tar.xz && mv /qt-everywhere-src-6.8.1 /qt6
   #install
-  WORKDIR /qt-everywhere-src-6.6.3
+  WORKDIR /qt6
   RUN --mount=type=cache,id=qtcache,target=/root/.cache/ccache \
     mkdir qt6_build && cd qt6_build && ../configure -- -D CMAKE_C_COMPILER_LAUNCHER=ccache -D CMAKE_CXX_COMPILER_LAUNCHER=ccache && cmake --build . --parallel $(nproc)
 
-  FROM scratch AS qt-dist
-  COPY --from=qt-base /qt-everywhere-src-6.6.3  .
+  # FROM scratch AS qt-dist
+  # COPY --from=qt-base /qt-everywhere-src-6.6.3  .
