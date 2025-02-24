@@ -39,4 +39,4 @@ services:
     security_opt:
       - seccomp:unconfined
 ```
-See issues for list of items to be done to make this better!
+See issues for a list of items to be done to make this better!
