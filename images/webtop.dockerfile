@@ -113,7 +113,8 @@
   libxcb-cursor-dev \
   gettext \
   libharfbuzz-dev \
-  libicu-dev
+  libicu-dev \
+  miniupnpc
   
     
     # RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install pdftotext
@@ -142,7 +143,7 @@
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && apt-get --no-install-recommends install -y \
     libstdc++6
-      
+    
+    ADD https://github.com/LizardByte/Sunshine/releases/download/v2025.122.141614/sunshine-ubuntu-22.04-amd64.deb /config/sunshine.deb
+    RUN apt install -y /config/sunshine.deb && rm /config/sunshine.deb
       ######### End Customizations ###########
-      
-  
