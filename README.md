@@ -1,7 +1,7 @@
 # ESDE-Docker
 A docker image for making a gaming webtop that I can host privately
 
-Targets afor infastructire are:
+Targets for infastructire are:
 - Linuxserver.io base
 - kasmweb-base
 
@@ -19,7 +19,7 @@ To run the image:
 Open your browser and go to "http://localhost:3000" You'll see your emulation-ready desktop.
 
 
-This is a compose file to runt he image.
+This is a compose file to run the image with more features.
 ```
 services:
   emu:
