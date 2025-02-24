@@ -9,18 +9,18 @@ Intent of this project is to be an Emulation Enthusiast platfrom be easilly upda
 
 First image is the webtop emulation target. To build, run:
 
-'docker buildx bake' 
+`docker buildx bake` 
 
 After this runs, there will be an image named emu-webtop. 
 To run the image:
 
-'docker run --network host emu-webtop:latest'
+`docker run --network host emu-webtop:latest`
 
 Open your browser and go to "http://localhost:3000" You'll see your emulation-ready desktop.
 
 
 This is a compose file to runt he image.
-'''
+```
 services:
   emu:
     image: emu-webtop:latest
