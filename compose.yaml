@@ -1,0 +1,96 @@
+services:
+  default:
+    build:
+      context: .
+      dockerfile: images/webtop.dockerfile
+      tags: [emu-webtop:latest]
+      additional_contexts:
+        - dolphin-dist=docker-image://dolphin-build
+        - rpcs3-dist=docker-image://rpcs3-build
+        - esde-dist=docker-image://esde-build
+    depends_on:
+    - dolphin-build
+    - rpcs3-build
+    - esde-build
+
+# ================================================================
+# =      ===============  =====  =======       ===================
+# =  ===  ==============  =====  =======  ====  ==================
+# =  ====  =============  =====  =======  ====  ==============  ==
+# =  ===  ===  =  ==  ==  =====  =======  ====  ==  ===   ===    =
+# =      ====  =  ======  ===    =======  ====  ======  =  ===  ==
+# =  ===  ===  =  ==  ==  ==  =  =======  ====  ==  ===  =====  ==
+# =  ====  ==  =  ==  ==  ==  =  =======  ====  ==  ====  ====  ==
+# =  ===  ===  =  ==  ==  ==  =  =======  ====  ==  ==  =  ===  ==
+# =      =====    ==  ==  ===    =======       ===  ===   ====   =
+# ================================================================
+
+  esde-build:
+    build:
+      context: .
+      dockerfile: progs/emulators/es-de.dockerfile
+      tags: [esde-build]
+      additional_contexts: 
+        build-base01: docker-image://build-base01
+    depends_on:
+    - buildbase
+
+  dolphin-build: 
+    build:
+      context: .
+      dockerfile: progs/emulators/dolphin.dockerfile
+      tags: [dolphin-build]
+      additional_contexts: 
+        build-base01: docker-image://build-base01
+    depends_on:
+    - buildbase
+
+  rpcs3-build:
+    build:
+      context: .
+      dockerfile: progs/emulators/rpcs3.dockerfile
+      tags: [rpcs3-build]
+      additional_contexts:
+        build-base01: docker-image://build-base01
+        base-sdl: docker-image://base-sdl
+        base-openal: docker-image://base-openal
+        qt-base: docker-image://qt-base
+    depends_on:
+    - buildbase
+    - sdl
+    - qt
+    - openal
+# ====================================================
+# =       ==================================  ========
+# =  ====  =================================  ========
+# =  ====  =================================  ========
+# =  ====  ===   ===    ====   ===  = ======  ===   ==
+# =  ====  ==  =  ==  =  ==  =  ==     ===    ==  =  =
+# =  ====  ==     ==  =  ==     ==  =  ==  =  ===  ===
+# =  ====  ==  =====    ===  =====  =  ==  =  ====  ==
+# =  ====  ==  =  ==  =====  =  ==  =  ==  =  ==  =  =
+# =       ====   ===  ======   ===  =  ===    ===   ==
+# ====================================================
+  buildbase:
+        build:
+            context: .
+            dockerfile: progs/dependencies/buildbase.dockerfile
+            tags: [build-base01]
+
+  qt:
+        build:
+            context: .
+            dockerfile: progs/dependencies/qt.dockerfile
+            tags: [qt-base]
+
+  sdl:
+        build:
+            context: .
+            dockerfile: progs/dependencies/sdl.dockerfile
+            tags: [base-sdl]
+
+  openal:
+    build:
+      context: .
+      dockerfile: progs/dependencies/openal.dockerfile
+      tags: [base-openal]

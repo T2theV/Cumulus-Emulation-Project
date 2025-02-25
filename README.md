@@ -39,4 +39,18 @@ services:
     security_opt:
       - seccomp:unconfined
 ```
+
+Want to include a build in your own services? try: replacing the image with the build context
+
+``` 
+-include
+services:
+ emu:
+    # image: emu-webtop:latest
+    build: 
+      context: https://raw.githubusercontent.com/T2theV/ESDE-Docker/refs/heads/main/compose.yaml
+    depends_on:
+      - default
+```
+
 See issues for a list of items to be done to make this better!
