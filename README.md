@@ -41,14 +41,15 @@ services:
 ```
 
 Want to include a build in your own services? try: replacing the image with the build context
-
+```bash # export COMPOSE_EXPERIMENTAL_GIT_REMOTE=1```
 ``` 
--include
+include:
+ - https://github.com/T2theV/ESDE-Docker.git
 services:
  emu:
     # image: emu-webtop:latest
     build: 
-      context: https://raw.githubusercontent.com/T2theV/ESDE-Docker/refs/heads/main/compose.yaml
+      context: https://github.com/T2theV/ESDE-Docker.git
     depends_on:
       - default
 ```
