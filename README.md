@@ -41,7 +41,7 @@ services:
 ```
 
 Want to include a build in your own services? try: replacing the image with the build context
-```bash # export COMPOSE_EXPERIMENTAL_GIT_REMOTE=1```
+```bash #export COMPOSE_EXPERIMENTAL_GIT_REMOTE=1```
 ``` 
 include:
  - https://github.com/T2theV/ESDE-Docker.git
