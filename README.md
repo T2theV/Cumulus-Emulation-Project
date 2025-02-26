@@ -1,5 +1,5 @@
 # ESDE-Docker
-A docker image for making a gaming webtop that can be host privately
+A docker image for making a gaming webtop that can be hosted privately
 
 Targets for infastructure are:
 - Linuxserver.io base
