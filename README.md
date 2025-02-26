@@ -1,9 +1,10 @@
 # ESDE-Docker
-A docker image for making a gaming webtop that I can host privately
+A docker image for making a gaming webtop that can be host privately
 
 Targets for infastructure are:
 - Linuxserver.io base
 - kasmweb-base
+- Games-on-Whales base (sunshine)
 
 Intent of this project is to be an Emulation Enthusiast platfrom be easilly updating the "Latest" versions of the emulators and being able to be easily depoyed via Docker. To achieve this, the platform is a docker build/bake project where emulators are build on bases containers, and the final container software stack is assembled. 
 
