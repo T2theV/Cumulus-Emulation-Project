@@ -124,10 +124,11 @@
         cd /dolphin/build && make install
     
       #RCPS3 
-      RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd /qt6/qt6_build && cmake --install .
+      # RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd /qt6/qt6_build && cmake --install .
       #RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
       #RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
            # cd/ /rpcs3_build/ && make install
+      COPY --from=rpcs3-dist /usr/local/Qt /usr/local/Qt
       COPY --from=rpcs3-dist /rpcs3_build/bin/ /rpcs3/
       ENV PATH=$PATH:/rpcs3
       
@@ -142,7 +143,8 @@
     RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && apt-get --no-install-recommends install -y \
-    libstdc++6
+    libstdc++6 wget
+    RUN sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
     
     ADD https://github.com/LizardByte/Sunshine/releases/download/v2025.122.141614/sunshine-ubuntu-22.04-amd64.deb /config/sunshine.deb
     RUN apt install -y /config/sunshine.deb && rm /config/sunshine.deb
