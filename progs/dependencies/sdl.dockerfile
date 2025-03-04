@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:latest
 
-FROM ubuntu:jammy AS base-sdl
+FROM ubuntu:noble AS base-sdl
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 --mount=type=cache,target=/var/lib/apt,sharing=locked \
 apt update && apt-get --no-install-recommends install -y \

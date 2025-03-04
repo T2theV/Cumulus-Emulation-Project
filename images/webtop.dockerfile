@@ -11,13 +11,13 @@
   # ====  ====  ======   ===    ====   ===   ===  ====
   # ==================================================
 
-  FROM ghcr.io/linuxserver/baseimage-kasmvnc:ubuntujammy AS webtop-emulation 
+  FROM ghcr.io/linuxserver/baseimage-kasmvnc:ubuntunoble AS webtop-emulation 
 
   # set version label
   ARG BUILD_DATE
   ARG VERSION
   LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-  LABEL maintainer="thelamer"
+  LABEL maintainer="T2theV"
   LABEL org.opencontainers.image.source https://github.com/T2theV/ESDE-Docker
   
   # title
@@ -144,8 +144,13 @@
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt update && apt-get --no-install-recommends install -y \
     libstdc++6 wget
-    RUN sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+    RUN <<EOT
+      wget https://apt.llvm.org/llvm.sh
+      chmod +x llvm.sh
+      ./llvm.sh 20
+EOT
     
     ADD https://github.com/LizardByte/Sunshine/releases/download/v2025.122.141614/sunshine-ubuntu-22.04-amd64.deb /config/sunshine.deb
     RUN apt install -y /config/sunshine.deb && rm /config/sunshine.deb
+    COPY images/webtop-files/kasmrun.run /etc/s6-overlay/s6-rc.d/svc-kasmvnc/run
       ######### End Customizations ###########
