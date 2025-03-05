@@ -11,7 +11,7 @@
 # =      =====    ==  ==  ===    =======      =====    ===   ====   ==
 # ====================================================================
 
-FROM ubuntu:jammy AS build-base01
+FROM ubuntu:noble AS build-base01
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt-get --no-install-recommends install -y \
