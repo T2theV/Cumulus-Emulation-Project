@@ -18,7 +18,7 @@ exec s6-setuidgid abc \
     -AlwaysShared \
     -http-header Cross-Origin-Embedder-Policy=require-corp \
     -http-header Cross-Origin-Opener-Policy=same-origin \
-    -geometry 3840x2160 \
+    -geometry 1920x1080 \
     -sslOnly 0 \
     -RectThreads 0 \
     -websocketPort 6901 \
