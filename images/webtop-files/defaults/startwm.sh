@@ -7,6 +7,7 @@ if which nvidia-smi; then
   export GALLIUM_DRIVER=zink
 fi
 
+sudo chown root:abc /dev/uinput
 sunshine &
 
 # Disable compositing
