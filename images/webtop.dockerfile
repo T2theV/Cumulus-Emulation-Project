@@ -149,8 +149,8 @@
       chmod +x llvm.sh
       ./llvm.sh 20
 EOT
-    
-    ADD https://github.com/LizardByte/Sunshine/releases/download/v2025.304.165840/sunshine-ubuntu-24.04-amd64.deb /config/sunshine.deb
+
+    ADD https://github.com/LizardByte/Sunshine/releases/download/v2025.122.141614/sunshine-ubuntu-24.04-amd64.deb /config/sunshine.deb
     RUN apt install -y /config/sunshine.deb && rm /config/sunshine.deb
     COPY images/webtop-files/kasmrun.run /etc/s6-overlay/s6-rc.d/svc-kasmvnc/run
     # COPY images/webtop-files/svc-sunshine /etc/s6-overlay/s6-rc.d/svc-sunshine
