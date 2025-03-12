@@ -52,6 +52,16 @@ target "rpcs3-build" {
     }
 }
 
+target "pcsx2-build" {
+    context = "."
+    dockerfile = "progs/emulators/pcsx2.dockerfile"
+    tags = ["pcsx2-build"]
+    contexts = {
+        build-base01 = "target:buildbase"
+        base-sdl3 = "target:sdl3"
+    }
+}
+
 // ====================================================
 // =       ==================================  ========
 // =  ====  =================================  ========
@@ -85,4 +95,10 @@ target "openal" {
     context = "."
     dockerfile = "progs/dependencies/openal.dockerfile"
     tags = ["base-openal"]
+}
+
+target "sdl3" {
+    context = "."
+    dockerfile = "progs/dependencies/sdl3.dockerfile"
+    tags = ["base-sdl3"]
 }
