@@ -56,7 +56,29 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   gettext \
   libharfbuzz-dev \
   libicu-dev \
-  ccache
+  ccache \
+  libaio-dev \
+  libbz2-dev \
+  libc6-dev \
+  libelf-dev \
+  libgl1-mesa-dev \
+  libgtk-3-dev \
+  libinput-dev \
+  libopenal-dev \
+  libsdl2-dev \
+  libusb-1.0-0-dev \
+  libvulkan-dev \
+  ninja-build \
+  pkg-config \
+  qtbase5-dev-tools \
+  qttools5-dev-tools \
+  wget \
+  zlib1g-dev \
+  liblz4-dev \
+  libpipewire-0.3-dev \
+  libwayland-dev \
+  libdecor-0-dev \
+  liburing-dev
 
   RUN ccache -M 0 --set-config=compiler_check=content --set-config=sloppiness=include_file_ctime,include_file_mtime
 
