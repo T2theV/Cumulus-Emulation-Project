@@ -114,7 +114,16 @@
   gettext \
   libharfbuzz-dev \
   libicu-dev \
-  miniupnpc
+  miniupnpc \
+  pipewire \
+  libpipewire-0.3-dev \
+  ccache \
+  liblzma-dev \
+  libzstd-dev \
+  libzstd-dev \
+  liblz4-dev \
+  libpcap-dev \
+  liburing-dev
   
     
     # RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install pdftotext
@@ -128,10 +137,18 @@
       #RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
       #RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
            # cd/ /rpcs3_build/ && make install
+      RUN --mount=type=bind,from=sdl3-dist,source=/app,target=/app,rw \
+        cd /app/SDL/build && make install
       COPY --from=rpcs3-dist /usr/local/Qt /usr/local/Qt
       COPY --from=rpcs3-dist /rpcs3_build/bin/ /rpcs3/
       ENV PATH=$PATH:/rpcs3
-      
+
+      #PCSX2
+      COPY --from=pcsx2-dist /opt/pcsx2/deps /opt/pcsx2/deps
+      COPY --from=pcsx2-dist /opt/pcsx2/build/bin /pcsx2
+      ENV PATH=$PATH:/pcsx2
+      ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/pcsx2/deps
+
       #ESDE
       RUN --mount=type=bind,from=esde-dist,source=/build,target=/build,rw \
         --mount=type=bind,from=esde-dist,source=/esde,target=/esde,rw \
