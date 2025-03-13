@@ -6,7 +6,8 @@ target "default" {
         dolphin-dist = "target:dolphin-build"
         rpcs3-dist = "target:rpcs3-build"
         esde-dist = "target:esde-build"
-        // qt-base = "target:qt"
+        pcsx2-dist = "target:pcsx2-build"
+        sdl3-dist = "target:sdl3"
     }
 }
 

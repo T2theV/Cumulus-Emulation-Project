@@ -78,7 +78,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   libpipewire-0.3-dev \
   libwayland-dev \
   libdecor-0-dev \
-  liburing-dev
+  liburing-dev \
+  pipewire
 
   RUN ccache -M 0 --set-config=compiler_check=content --set-config=sloppiness=include_file_ctime,include_file_mtime
 
