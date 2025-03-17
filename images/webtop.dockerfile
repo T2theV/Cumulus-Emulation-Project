@@ -149,6 +149,14 @@
       ENV PATH=$PATH:/pcsx2
       ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/pcsx2/deps
 
+      #N64 RMG
+      RUN --mount=type=bind,from=n64-dist,source=/RMG,target=/RMG,rw \
+        cd RMG/build && cmake --install . --prefix="/usr"
+
+      #XEmu XBOX
+      COPY --from=xbox-dist /xemu/dist/xemu /xemu
+      ENV PATH=$PATH:/xemu
+
       #ESDE
       RUN --mount=type=bind,from=esde-dist,source=/build,target=/build,rw \
         --mount=type=bind,from=esde-dist,source=/esde,target=/esde,rw \
