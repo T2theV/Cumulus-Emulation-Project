@@ -175,7 +175,7 @@ EOT
         cd /build && make install
   
   
-    run add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
   
     RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
