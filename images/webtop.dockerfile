@@ -123,7 +123,10 @@
   libzstd-dev \
   liblz4-dev \
   libpcap-dev \
-  liburing-dev
+  liburing-dev \
+  libslirp0 \
+  libminizip1 \
+  libsdl2-net-dev
   
     
     # RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install pdftotext
@@ -147,7 +150,24 @@
       COPY --from=pcsx2-dist /opt/pcsx2/deps /opt/pcsx2/deps
       COPY --from=pcsx2-dist /opt/pcsx2/build/bin /pcsx2
       ENV PATH=$PATH:/pcsx2
-      ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/pcsx2/deps
+      RUN <<EOT bash
+        echo "/opt/pcsx2/deps" > /etc/ld.so.conf.d/pcsx2.conf
+        ldconfig
+EOT
+
+
+      #N64 RMG
+      COPY --from=n64-dist /usr/local/Qt /usr/local/Qt
+      RUN --mount=type=bind,from=n64-dist,source=/RMG,target=/RMG,rw \
+        cd RMG/build && cmake --install . --prefix="/usr"
+      RUN <<EOT bash
+        echo "/usr/local/Qt/6.8.2/gcc_64/lib" > /etc/ld.so.conf.d/qt.conf
+        ldconfig
+EOT
+
+      #XEmu XBOX
+      COPY --from=xbox-dist /xemu/dist /xemu
+      ENV PATH=$PATH:/xemu
 
       #ESDE
       RUN --mount=type=bind,from=esde-dist,source=/build,target=/build,rw \
@@ -155,7 +175,7 @@
         cd /build && make install
   
   
-    run add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
   
     RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \

@@ -8,6 +8,8 @@ target "default" {
         esde-dist = "target:esde-build"
         pcsx2-dist = "target:pcsx2-build"
         sdl3-dist = "target:sdl3"
+        n64-dist = "target:n64-build"
+        xbox-dist = "target:xbox-build"
     }
 }
 
@@ -60,6 +62,22 @@ target "pcsx2-build" {
     contexts = {
         build-base01 = "target:buildbase"
         base-sdl3 = "target:sdl3"
+    }
+}
+
+target "n64-build" {
+    context = "."
+    dockerfile = "progs/emulators/n64.dockerfile"
+    tags = ["n64-build"]
+    contexts = {
+    }
+}
+
+target "xbox-build" {
+    context = "."
+    dockerfile = "progs/emulators/xemu.dockerfile"
+    tags = ["xbox-build"]
+    contexts = {
     }
 }
 
