@@ -47,7 +47,6 @@ RUN aqt install-qt linux desktop 6.8.2 -O /usr/local/Qt -m qtmultimedia qtwebsoc
 
 # # Build and install Rosalie's Mupen GUI with CMake prefix path
 RUN mkdir build && \
-     cd build && \
-    cmake .. -DCMAKE_PREFIX_PATH=/usr/local/Qt/6.8.2/gcc_64/lib/cmake -DCMAKE_BUILD_TYPE="Release" -DPORTABLE_INSTALL="OFF" -G "Ninja" && \ 
-    ninja
+    cmake -S . -B ./build -DCMAKE_PREFIX_PATH=/usr/local/Qt/6.8.2/gcc_64/lib/cmake -DCMAKE_BUILD_TYPE="Release" -DPORTABLE_INSTALL="OFF" -DCMAKE_INSTALL_PREFIX="/usr" -G "Ninja" && \ 
+    cmake --build ./build
 
