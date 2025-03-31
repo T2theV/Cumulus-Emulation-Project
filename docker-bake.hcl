@@ -10,6 +10,8 @@ target "default" {
         sdl3-dist = "target:sdl3"
         n64-dist = "target:n64-build"
         xbox-dist = "target:xbox-build"
+        dreamcast-dist = "target:flycast-build"
+        ps1-dist = "target:duckstation-build"
     }
 }
 
@@ -81,6 +83,21 @@ target "xbox-build" {
     }
 }
 
+target "flycast-build" {
+    context = "."
+    dockerfile = "progs/emulators/flycast.dockerfile"
+    tags = ["dreamcast-build"]
+    contexts = {
+    }
+}
+
+target "duckstation-build" {
+    context = "."
+    dockerfile = "progs/emulators/duckstation.dockerfile"
+    tags = ["ps1-build"]
+    contexts = {
+    }
+}
 // ====================================================
 // =       ==================================  ========
 // =  ====  =================================  ========
