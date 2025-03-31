@@ -1,0 +1,23 @@
+[general]
+show_welcome = false
+last_viewed_menu_index = 2
+
+[input.bindings]
+port1_driver = 'usb-xbox-gamepad'
+port1 = '03008d205e040000ea02000008040000'
+
+[display.quality]
+surface_scale = 2
+
+[display.window]
+fullscreen_on_startup = true
+last_width = 960
+last_height = 990
+
+[sys.files]
+bootrom_path = '/config/XEMU FILES/Boot ROM Image/mcpx_1.0.bin'
+flashrom_path = '/config/XEMU FILES/BIOS/Complex_4627v1.03.bin'
+eeprom_path = '/config/.local/share/xemu/xemu/eeprom.bin'
+hdd_path = '/config/XEMU FILES/Xbox Hard Disk Image/xbox_hdd.qcow2'
+dvd_path = '/ROMs/xbox/Shadow the Hedgehog (USA) (En,Ja,Fr,De,Es,It).iso'
+
