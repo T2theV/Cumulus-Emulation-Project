@@ -8,9 +8,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
   --mount=type=cache,target=/var/lib/apt,sharing=locked \
   apt update && apt --no-install-recommends install -y \
-  build-essential curl cmake libsdl2-dev libepoxy-dev \
+  git build-essential curl cmake libsdl2-dev libepoxy-dev \
   libpixman-1-dev libgtk-3-dev libssl-dev libsamplerate0-dev \
-  libpcap-dev ninja-build python3-yaml python3-pip libslirp-dev libvulkan-dev
+  libpcap-dev ninja-build python3-yaml python3-pip libslirp-dev libvulkan-dev \
+  libcurl4-openssl-dev
 
 # Clone the Flycast repository
 ADD https://github.com/flyinghead/flycast.git /flycast
@@ -20,4 +21,4 @@ RUN mkdir /flycast/build
 WORKDIR /flycast/build
 
 # Build Flycast
-RUN cmake .. && make -j$(nrpoc)
+RUN cmake .. && make -j$(nproc)

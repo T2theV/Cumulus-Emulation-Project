@@ -169,6 +169,15 @@ EOT
       COPY --from=xbox-dist /xemu/dist /xemu
       ENV PATH=$PATH:/xemu
 
+      #Flycast Dreamcast
+      COPY --from=dreamcast-dist /flycast/build/flycast /flycast/flycast
+      ENV PATH=$PATH:/flycast
+
+      #duckstation
+      COPY --from=ps1-dist /duckstation/build/deps /duckstation/build/deps
+      COPY --from=ps1-dist /duckstation/build/bin /duckstation
+      ENV PATH=$PATH:/duckstation
+
       #ESDE
       RUN --mount=type=bind,from=esde-dist,source=/build,target=/build,rw \
         --mount=type=bind,from=esde-dist,source=/esde,target=/esde,rw \

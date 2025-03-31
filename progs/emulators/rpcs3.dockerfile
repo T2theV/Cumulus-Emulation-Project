@@ -40,7 +40,7 @@
   apt update && apt-get --no-install-recommends install -y \
   python3-pip vulkan-sdk gcc-13 g++-13 
   RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install --break-system-packages cmake aqtinstall
-  run aqt install-qt linux desktop 6.8.2 -O /usr/local/Qt -m qtmultimedia 
+  RUN aqt install-qt linux desktop 6.8.2 -O /usr/local/Qt -m qtmultimedia 
   ENV CXX=g++-13 
   ENV CC=gcc-13
   RUN <<EOT
@@ -51,4 +51,10 @@ EOT
   ADD --keep-git-dir https://github.com/RPCS3/rpcs3.git /rpcs3
   RUN --mount=type=cache,target=/root/.cache/ccache \
   mkdir --parents rpcs3_build && cd rpcs3_build && \
-  cmake -DCMAKE_PREFIX_PATH=/usr/local/Qt/6.8.2/gcc_64/ -DUSE_NATIVE_INSTRUCTIONS=OFF  -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache ../rpcs3/ && make -j$(nproc)
+  cmake \
+  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+  -DCMAKE_PREFIX_PATH=/usr/local/Qt/6.8.2/gcc_64/ \
+  -DUSE_NATIVE_INSTRUCTIONS=OFF  \
+  -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+  ../rpcs3/ && make -j$(nproc)
