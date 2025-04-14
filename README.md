@@ -22,10 +22,10 @@ To run the image:
 Copy udev rules to your host server to enable sunshine hotplugging controllers:
 
 ```
-cp emu-webtop:/udev/80-sunshine-ins.rules /etc/udev/rules.d/
-sudo chown root:root /etcudev/rules.d/80-sumshine-ins.rules
-sudo udevadm reload
 cp emu-webtop:/udev/docker_tty.sh /usr/local/bin/
+cp emu-webtop:/udev/80-sunshine-ins.rules /etc/udev/rules.d/
+sudo chown root:root /etc/udev/rules.d/80-sunshine-ins.rules
+sudo udevadm reload
 ```
 
 Open your browser and go to "http://localhost:3000" You'll see your emulation-ready desktop.
@@ -52,11 +52,12 @@ services:
       - seccomp:unconfined
 ```
 
-**I NEED YOUR HELP**
+**I NEED YOUR HELP!!!**
 
 I have a good start, but there is much to be done before I would consider the project stable. 
 
 See issues for a list of items to be done to make this better!
 
 **NO RETROARCH**
+
 I'm trying to avoid retroarch as mucha as possible. This project aims to replace the Retroarch framework. Why? Nothing against Retroarch, but 6/7th gen console projects typically don't optimize for Retroarch which is the starting point for this project. I don't have much experience emulating earlier consoles which then I'll consider introducing Retroarch.
