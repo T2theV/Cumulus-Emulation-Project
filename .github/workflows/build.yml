@@ -46,7 +46,7 @@ jobs:
         id: emulator_name
         run: |
           {
-            echo 'name=EOF'
+            echo 'name<<EOF'
               jq '. | map(.name)' emulators.json
             echo 'EOF' 
           } >> $GITHUB_OUTPUT
