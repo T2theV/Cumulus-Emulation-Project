@@ -77,23 +77,25 @@ jobs:
       #     registry: ghcr.io
       #     username: ${{ github.repository_owner }}
       #     password: ${{ secrets.TIMSPAT }}
-      - name: get-build-parameters
-        id: get_build_parameters
+      # - name: get-build-parameters
+      #   id: get_build_parameters
         # outputs: index
-        run: |
-          index=$(jq '. | map(.name == "${{ matrix.EMULATOR }}") | index(true)' emulators.json)
-          echo $index
-          echo "index=$index" >> $GITHUB_OUTPUT
+        # run: |
+          # index=$(jq '. | map(.name == "${{ matrix.EMULATOR }}") | index(true)' emulators.json)
+          # echo $index
+          # echo "index=$index" >> $GITHUB_OUTPUT
       
       - name: Get Emulator JSON
         id: get_emu_json
         run: |
+          index=$(jq '. | map(.name == "${{ matrix.EMULATOR }}") | index(true)' emulators.json)
           emulator_json=$(jq '.[$index]' emulators.json)
           echo "emulator_json=$emulator_json" >> $GITHUB_OUTPUT
-
-      - name: Build Emulator
-        run: |
-          docker build -t emulator-${{ matrix.EMULATOR}} $(jq '.[$index].dockerfile' emulators.json)
+          docker build -t emulator-$(jq '.[$index].name') $(jq '.[$index].dockerfile' emulators.json)
+      
+      # - name: Build Emulator
+      #   run: |
+      #     docker build -t emulator-${{ matrix.EMULATOR}} $(jq '.[$index].dockerfile' emulators.json)
       
                     
 
