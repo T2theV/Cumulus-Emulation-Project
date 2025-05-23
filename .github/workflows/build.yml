@@ -89,9 +89,9 @@ jobs:
         id: get_emu_json
         run: |
           export index=$(jq '. | map(.name == "${{ matrix.EMULATOR }}") | index(true)' emulators.json)
-          emulator_json=$(jq '.[$index]' emulators.json)
+          emulator_json=$(jq ".[$index]" emulators.json)
           echo "emulator_json=$emulator_json" >> $GITHUB_OUTPUT
-          docker build -t emulator-$(jq '.[$index].name') $(jq '.[$index].dockerfile' emulators.json)
+          docker build -t emulator-$(jq ".[$index].name") $(jq ".[$index].dockerfile" emulators.json)
       
       # - name: Build Emulator
       #   run: |
