@@ -92,7 +92,7 @@ jobs:
           emulator_json=$(jq ".[$index]" emulators.json)
           echo "emulator_json=$emulator_json" >> $GITHUB_OUTPUT
           emulator_name=$(jq -r ".[$index].name" emulators.json)
-          docker build -t emulator-$emulator_name $(jq -r ".[$index].dockerfile" emulators.json)
+          docker build -t emulator-$emulator_name -f $(jq -r ".[$index].dockerfile" emulators.json) .
       
       # - name: Build Emulator
       #   run: |
