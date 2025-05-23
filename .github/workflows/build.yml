@@ -81,7 +81,7 @@ jobs:
         id: get_build_parameters
         # outputs: index
         run: |
-          index=$(jq '. | map(.name == "'${{ matrix.EMULATOR }} '") | index(true)' emulators.json)
+          index=$(jq '. | map(.name == "${{ matrix.EMULATOR }}") | index(true)' emulators.json)
           echo $index
           echo "index=$index" >> $GITHUB_OUTPUT
       
