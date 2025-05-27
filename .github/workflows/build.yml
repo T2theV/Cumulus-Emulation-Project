@@ -94,19 +94,19 @@ jobs:
           echo emulator_name=$emulator_name >> $GITHUB_OUTPUT
           echo emulator_dockerfile=$emulator_dockerfile >> $GITHUB_OUTPUT
 
-      - name: Build Emulator
-        run: |
-          docker build -t emulator-${{ steps.get_emu_vars.outputs.emulator_name }} -f ${{ steps.get_emu_vars.outputs.emulator_dockerfile }} type=docker,dest=/tmp/${{ steps.get_emu_vars.outputs.emulator_name }}-build.tar .
+      # - name: Build Emulator
+      #   run: |
+      #     docker build -t emulator-${{ steps.get_emu_vars.outputs.emulator_name }} -f ${{ steps.get_emu_vars.outputs.emulator_dockerfile }} type=docker,dest=/tmp/type=docker,dest=/tmp/dolphin-build.tar-build.tar .
       
                     
 
-      # - name: Build & Push Docker Image 
-      #   uses: docker/build-push-action@v5
-      #   with:
-      #     push: false
-      #     target: dolphin-dist
-      #     tags: dolphin-build
-      #     outputs: type=docker,dest=/tmp/dolphin-build.tar
+      - name: Build & Push Docker Image 
+        uses: docker/build-push-action@v5
+        with:
+          push: false
+          # target: dolphin-dist
+          tags: ${{ steps.get_emu_vars.outputs.emulator_name }}-build
+          outputs: type=docker,dest=/tmp/$$ steps.get_emu_vars.outputs.emulator_name }}-build.tar
           # cache-from: ghcr.io/t2thev/bkdolphin
           # cache-to: ghcr.io/t2thev/bkdolphin
           # file: 
