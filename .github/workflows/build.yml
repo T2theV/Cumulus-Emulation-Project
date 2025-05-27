@@ -96,7 +96,7 @@ jobs:
 
       - name: Build Emulator
         run: |
-          docker build -t emulator-${{ steps.get_emu_vars.outputs.emulator_name }} -f ${{ steps.get_emu_vars.outputs.emulator_dockerfile }} .
+          docker build -t emulator-${{ steps.get_emu_vars.outputs.emulator_name }} -f ${{ steps.get_emu_vars.outputs.emulator_dockerfile }} type=docker,dest=/tmp/${{ steps.get_emu_vars.outputs.emulator_name }}-build.tar .
       
                     
 
@@ -112,11 +112,11 @@ jobs:
           # file: 
           # build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: dolphin-build.tar
-      #     path: /tmp/dolphin-build.tar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.get_emu_vars.outputs.emulator_name }}-build.tar
+          path: /tmp/${{ steps.get_emu_vars.outputs.emulator_name }}-build.tar
 
   build-webtop:
     if: 0
