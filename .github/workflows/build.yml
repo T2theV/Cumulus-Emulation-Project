@@ -85,8 +85,8 @@ jobs:
           # echo $index
           # echo "index=$index" >> $GITHUB_OUTPUT
       
-      - name: Get Emulator JSON
-        id: get_emu_json
+      - name: Get Emulator Vars
+        id: get_emu_vars
         run: |
           export index=$(jq '. | map(.name == "${{ matrix.EMULATOR }}") | index(true)' emulators.json)
           emulator_name=$(jq -r ".[$index].name" emulators.json)
@@ -94,7 +94,7 @@ jobs:
           
       - name: Build Emulator
         run: |
-          docker build -t emulator-$emulator_name -f $emulator_dockerfile .
+          docker build -t emulator-${{ steps.get_emu_vars.outputs.emulator_name }} -f ${{ steps.get_emu_vars.outputs.emulator_dockerfile }} .
       
                     
 
