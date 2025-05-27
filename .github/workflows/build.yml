@@ -106,7 +106,7 @@ jobs:
           push: false
           # target: dolphin-dist
           tags: ${{ steps.get_emu_vars.outputs.emulator_name }}-build
-          outputs: type=docker,dest=/tmp/$$ steps.get_emu_vars.outputs.emulator_name }}-build.tar
+          outputs: type=docker,dest=/tmp/${{ steps.get_emu_vars.outputs.emulator_name }}-build.tar
           # cache-from: ghcr.io/t2thev/bkdolphin
           # cache-to: ghcr.io/t2thev/bkdolphin
           # file: 
