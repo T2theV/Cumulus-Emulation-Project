@@ -4,23 +4,30 @@ let
   pkgs = import nixpkgs { config = {}; overlays = []; };
 in
 rec{
-  # dolphin = pkgs.callPackage ./dolphin.nix { };
+  dolatts = builtins.fromJSON ( builtins.readFile ./dol.json);
   dolphin-new = pkgs.dolphin-emu.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {
-      owner = "dolphin-emu";
-      repo = "dolphin";
-      rev = "04f71e5e6d6b7fd3736b8b1f60f7970b34ec1e3f";
-      hash = "sha256-hfiB2RxWqe4sQoMrG08CcKfhenARwiDUtARe2ew3/DU=";
-      fetchSubmodules = true;
-      leaveDotGit = true;
-      postFetch = ''
-        pushd $out
-        git rev-parse HEAD 2>/dev/null >$out/COMMIT
-        find $out -name .git -print0 | xargs -0 rm -rf
-        popd
-      '';
-    };
+        owner = dolatts.owner;
+        repo = dolatts.repo;
+        rev = dolatts.rev;
+        hash = dolatts.hash;
+        fetchSubmodules = true;
+        leaveDotGit = true;
+      };
+    preConfigure = "";
     patches = [ ];
   });
+
+  #rpcs3-new = pkgs.rpcs3.overrideAttrs (finalAttrs: previousAttrs: {
+  #  version = "master";
+  #  src = pkgs.fetchFromGitHub {
+  #    owner = "RPCS3";
+  #    repo = "rpcs3";
+  #    rev = "cf87f24587754cd3869430d0df6d396985db3165";
+  #    hash = "sha256-GiuGYk9OzGWVoEyIEVLaNY/fIM+7L5N2zjXGDgpt5vE=";
+  #    fetchSubmodules = true;
+  #  };
+    patches = [ ];
+});
 }
