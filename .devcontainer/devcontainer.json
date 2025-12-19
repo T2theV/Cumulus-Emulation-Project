@@ -1,7 +1,7 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {},
-  "postCreateCommand": "sudo mkdir /nix && sudo chown -R codespace /nix && curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh",
+  "postCreateCommand": "sudo mkdir /nix && sudo chown -R codespace /nix && curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh && echo '. /home/codespace/.nix-profile/etc/profile.d/nix.sh' >> /home/codespace/.bashrc",
   "customizations": {
 		"vscode": {
 			"extensions": [
