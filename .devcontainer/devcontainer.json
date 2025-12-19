@@ -1,7 +1,7 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {},
-  "postCreateCommand": "sudo mkdir /nix && sudo chown -R codespace /nix && sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon",
+  "postCreateCommand": "'sudo mkdir /nix && sudo chown -R codespace /nix && sh <(curl --proto '\''=https'\'' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon'",
   "customizations": {
 		"vscode": {
 			"extensions": [
