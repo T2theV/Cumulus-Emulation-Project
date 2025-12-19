@@ -1,0 +1,12 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {},
+  "postCreateCommand": "mkdir /nix && sudo chown -R devcontainer /nix && sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --no-daemon",
+  "customizations": {
+		"vscode": {
+			"extensions": [
+        "bbenoist.Nix"
+      ]
+		}
+  }
+}
