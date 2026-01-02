@@ -14,4 +14,4 @@ ENV NIX_PROFILES="/nix/var/nix/profiles/default /root/.nix-profile"
 ENV NIX_PATH=/root/.nix-defexpr/channels
 ENV NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 ENV PATH=/root/.nix-profile/bin:$PATH
-RUN . /root/.nix-profile/etc/profile.d/nix.sh && ./build.sh && nix-build dolphin.nix rpcs3.nix
+RUN ./build.sh && nix-build dolphin.nix rpcs3.nix
