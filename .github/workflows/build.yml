@@ -38,5 +38,6 @@ jobs:
           push: true
           tags: ghcr.io/t2thev/emunix
           file: nix/Dockerfile
+          context: nix/
 
           
