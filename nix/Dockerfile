@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-selkies:ubuntunoble
+FROM lscr.io/linuxserver/webtop:ubuntu-mate
 
 RUN apt update && apt install -y xz-utils libssl-dev wget
 
