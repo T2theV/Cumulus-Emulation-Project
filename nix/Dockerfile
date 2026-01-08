@@ -9,11 +9,8 @@ COPY ./dolphin.nix .
 COPY ./rpcs3.nix .
 
 
-RUN curl -L https://nixos.org/nix/install | sh -s -- --daemon
-
-
-ENV NIX_PROFILES="/nix/var/nix/profiles/default /root/.nix-profile"
-ENV NIX_PATH=/root/.nix-defexpr/channels
-ENV NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
-ENV PATH=/root/.nix-profile/bin:$PATH
-RUN ./build.sh && nix-build dolphin.nix rpcs3.nix
+# RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
+RUN curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | \
+  sh -s -- install linux --init none --no-confirm --extra-conf "trusted-users = $(whoami)" 
+RUN  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
+./build.sh && nix-build dolphin.nix rpcs3.nix
