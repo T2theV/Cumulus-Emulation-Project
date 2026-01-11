@@ -18,5 +18,5 @@ RUN apt install -y ./sunshine.deb
 RUN  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 nix-channel --add https://github.com/nix-community/nixGL/archive/main.tar.gz nixgl && nix-channel --update && \
 nix-env -iA nixgl.nixVulkanIntel && \
-./build.sh && nix-build dolphin.nix rpcs3.nix && \
-nix-env -i dolphin.nix
+./build.sh && nix-build dolphin.nix rpcs3.nix
+RUN nix-env -i -f ./dolphin.nix
