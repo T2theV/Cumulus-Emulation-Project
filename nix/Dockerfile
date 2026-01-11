@@ -13,7 +13,7 @@ RUN curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/
   sh -s -- install linux --init none --no-confirm --extra-conf "trusted-users = $(whoami)"
 
 ADD https://github.com/LizardByte/Sunshine/releases/download/v2025.924.154138/sunshine-ubuntu-24.04-amd64.deb sunshine.deb
-RUN apt install ./sunshine.deb
+RUN apt install -y ./sunshine.deb
 
 RUN  . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 nix-channel --add https://github.com/nix-community/nixGL/archive/main.tar.gz nixgl && nix-channel --update && \
