@@ -70,7 +70,6 @@ stdenv.mkDerivation (finalAttrs: {
     which
     wrapGAppsHook3
     glslang
-    git
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     darwin.sigtool
@@ -88,7 +87,6 @@ stdenv.mkDerivation (finalAttrs: {
     gettext
     glib
     gtk3
-    git
     curl
     glslang
     libepoxy
