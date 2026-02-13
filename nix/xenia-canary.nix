@@ -4,8 +4,9 @@ let
 in
 rec{
 
+  xenia-canaryLocal = pkgs.callPackage ./xenia-canary-pkg.nix { };
   xeniaatts = builtins.fromJSON ( builtins.readFile ./xenia.json);
-  xenia-new = pkgs.xenia-canary.overrideAttrs (finalAttrs: previousAttrs: {
+  xenia-new = xenia-canaryLocal.overrideDerivation (oldAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {
         owner = xeniaatts.owner;
@@ -14,7 +15,6 @@ rec{
         hash = xeniaatts.hash;
         fetchSubmodules = true;
       };
-    patches = [ ];
   });
 
 }
