@@ -17,15 +17,16 @@ RUN apt install -y ./sunshine.deb
 RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 #nix-channel --add https://github.com/nix-community/nixGL/archive/main.tar.gz nixgl && nix-channel --update && \
 #nix-env -iA nixgl.nixVulkanIntel && \
-./build.sh && nix-build cemu.nix
-#flycast.nix pcsx2.nix rpcs3.nix dolphin.nix xemu.nix
+./build.sh && nix-build flycast.nix pcsx2.nix rpcs3.nix dolphin.nix xenia-canary.nix rmg.nix
 
 RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 nix-env -i -f ./dolphin.nix && \
 nix-env -i -f ./rpcs3.nix && \
-nix-env -i -f ./xemu.nix && \
 nix-env -i -f ./pcsx2.nix && \
-nix-env -i -f ./flycast.nix
+nix-env -i -f ./flycast.nix && \
+nix-env -i -f ./xenia-canary.nix && \
+nix-env -i -f ./rmg.nix
+
 
 
 RUN rm -rf /config/.cache
