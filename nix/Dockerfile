@@ -15,8 +15,8 @@ ADD https://github.com/LizardByte/Sunshine/releases/download/v2025.924.154138/su
 RUN apt install -y ./sunshine.deb
 
 RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
-#nix-channel --add https://github.com/nix-community/nixGL/archive/main.tar.gz nixgl && nix-channel --update && \
-#nix-env -iA nixgl.nixVulkanIntel && \
+nix-channel --add https://github.com/nix-community/nixGL/archive/main.tar.gz nixgl && nix-channel --update && \
+nix-env -iA nixgl.nixVulkanIntel && \
 ./build.sh && nix-build flycast.nix pcsx2.nix rpcs3.nix dolphin.nix xenia-canary.nix rmg.nix
 
 RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
