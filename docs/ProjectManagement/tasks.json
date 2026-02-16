@@ -1,0 +1,30 @@
+[
+    {
+        "id": 1,
+        "task": "Merge Initiaisation Checks"
+    },
+    {
+        "id": 2,
+        "task": "Add ES-DE into nixbuilder dockerfile"
+    },
+    {
+        "id": 3,
+        "task": "Modify ES-DE Systems file to add nixVulkan wrapper on launch"
+    },
+    {
+        "id": 4,
+        "task": "Add sunshine automatic startup"
+    },
+    {
+        "id": 5,
+        "task": "Change compose file to match forwarding followup"
+    },
+    {
+        "id": 6,
+        "task": "Add Nix build for selkies"
+    },
+    {
+        "id": 7,
+        "task": "Add Nix build for ES-DE"
+    }
+]
