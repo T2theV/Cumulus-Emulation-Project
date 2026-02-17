@@ -26,5 +26,21 @@
     {
         "id": 7,
         "task": "Add Nix build for ES-DE"
+    },
+    {
+        "id": 8,
+        "task": "Change nix to import derivations and get all emulators in a single file"
+    },
+    {
+        "id": 9,
+        "task": "RPCS3 change input arguement from flatbuff to protobuffs"
+    },
+    {
+        "id": 10,
+        "task": "xemu change buildinputs to download sdl3 also"
+    },
+    {
+        "id": 11,
+        "task": "Cemu figure out andother patch for whatever is failing"
     }
 ]
