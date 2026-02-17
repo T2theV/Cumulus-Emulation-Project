@@ -6,7 +6,7 @@ in
 rec {
   #xemuatts = builtins.fromJSON ( builtins.readFile ./xemu.json);
   xemu-new = pkgs.xemu.overrideAttrs (finalAttrs: previousAttrs: {
-      version = "master";
+      version = "99.99.99";
       src = pkgs.fetchFromGitHub {
         owner = "xemu-project";
         repo = "xemu";
