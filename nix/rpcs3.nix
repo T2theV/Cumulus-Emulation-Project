@@ -18,3 +18,15 @@ rec{
   });
 
 }
+
+{
+  packageOverrides = pkgs: rec {
+    myPackage = pkgs.myPackage.override {
+      # Pass a different version of a dependency
+      someDependency = pkgs.someDependency.overrideAttrs (old: {
+        version = "1.2.3";
+        # ... other attribute changes like src and sha256
+      });
+    };
+  };
+}
