@@ -4,14 +4,14 @@ let
   pkgs = import nixpkgs { config = {}; overlays = []; };
 in
 rec {
-  #xemuatts = builtins.fromJSON ( builtins.readFile ./xemu.json);
+  xemuatts = builtins.fromJSON ( builtins.readFile ./xemu.json);
   xemu-new = pkgs.xemu.overrideAttrs (finalAttrs: previousAttrs: {
       version = "99.99.99";
       src = pkgs.fetchFromGitHub {
         owner = "xemu-project";
         repo = "xemu";
-        rev = "3b13aed14ce6350c0cbd7696799b041037c91ece";
-        hash = "sha256-kTqg2Oo4bWyCkmcxAgE/bqCYAczPflKjwzrqveyG5H0=";
+        rev = xemuatts.rev;
+        hash = xemuatts.hash;
 
         nativeBuildInputs = [
           pkgs.git

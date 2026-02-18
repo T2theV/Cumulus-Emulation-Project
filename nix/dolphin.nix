@@ -5,11 +5,11 @@ let
 in
 rec{
   dolatts = builtins.fromJSON ( builtins.readFile ./dol.json);
-  dolphin-new = pkgs.dolphin-emu.overrideDerivation (oldAttrs: {
+  dolphin-new = pkgs.dolphin-emu.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {
-        owner = dolatts.owner;
-        repo = dolatts.repo;
+        owner = dolphin-emu;
+        repo = dolphin;
         rev = dolatts.rev;
         hash = dolatts.hash;
         fetchSubmodules = true;
