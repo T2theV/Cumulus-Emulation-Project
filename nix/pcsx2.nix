@@ -5,7 +5,7 @@ let
 in
 rec{
   pcsx2atts = builtins.fromJSON ( builtins.readFile ./pcsx2.json);
-  pcsx2-new = pkgs.pcsx2.overrideAttrs (finalAttrs: finalAttrs: {
+  pcsx2-new = pkgs.pcsx2.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {
         owner = "pcsx2";
