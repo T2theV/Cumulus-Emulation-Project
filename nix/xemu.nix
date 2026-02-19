@@ -11,7 +11,7 @@ rec {
         owner = "xemu-project";
         repo = "xemu";
         rev = "5aeacacfeb7a28ad7d5a9ecab9978115804148dc";
-        hash = "";
+        hash = "sha256-2ry9+Hniyz1mDr1wdtoi0bg5ks46GwF9r9s3qzsSHQY=";
 
         nativeBuildInputs = [
           pkgs.git

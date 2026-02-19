@@ -12,7 +12,7 @@ rec{
         repo = "xenia-canary";
         fetchSubmodules = true;
         rev = "bc69b95db698efdcb4dcf36101b9c252d28f0c95";
-        hash = "";
+        hash = "sha256-0jflmjEtY2RuJSaiCPTlhWCS0bQDMp9ZyILxmUxLvzk=";
       };
   });
 

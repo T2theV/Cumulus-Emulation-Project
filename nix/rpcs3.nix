@@ -11,7 +11,7 @@ rec{
         owner = "rpcs3";
         repo = "rpcs3";
         rev = "2064bd87e37da1d0946f7c5b62f2d38003abff8e";
-        hash = "";
+        hash = "sha256-jF7Rexd9I91yROUJwCQJxdapouYwR7MR88LduWkG/Rg=";
 
         postCheckout = ''
           cd $out/3rdparty

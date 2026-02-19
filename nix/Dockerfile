@@ -17,12 +17,12 @@ RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 nix-channel --add https://github.com/nix-community/nixGL/archive/main.tar.gz nixgl && nix-channel --update && \
 nix-env -iA nixgl.nixVulkanIntel 
 
-COPY ./build.sh .
+# COPY ./build.sh .
 COPY ./*.nix .
 
 RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
-./build.sh && \
-nix-build dolphin.nix flycast.nix pcsx2.nix 
+# ./build.sh && \
+nix-build dolphin.nix flycast.nix pcsx2.nix && \
 nix-build rmg.nix rpcs3.nix && \
 nix-build xemu.nix xenia-canary.nix
 
