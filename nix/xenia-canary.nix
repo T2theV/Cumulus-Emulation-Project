@@ -4,15 +4,15 @@ let
 in
 rec{
 
-  xeniaatts = builtins.fromJSON ( builtins.readFile ./xenia.json);
+  # xeniaatts = builtins.fromJSON ( builtins.readFile ./xenia.json);
   xenia-new = pkgs.xenia-canary.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {
         owner = "xenia-canary";
         repo = "xenia-canary";
         fetchSubmodules = true;
-        rev = xeniaatts.rev;
-        hash = xeniaatts.hash;
+        rev = "bc69b95db698efdcb4dcf36101b9c252d28f0c95";
+        hash = "";
       };
   });
 

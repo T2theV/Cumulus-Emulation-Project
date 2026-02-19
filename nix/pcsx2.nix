@@ -10,8 +10,8 @@ rec{
       src = pkgs.fetchFromGitHub {
         owner = "pcsx2";
         repo = "pcsx2";
-        rev = pcsx2atts.rev;
-        hash = pcsx2atts.hash;
+        rev = "b7fa45ee76bb47e02ce78ebd674d3dd46d519689";
+        hash = "";
       };
   });
 }

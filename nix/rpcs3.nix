@@ -4,14 +4,14 @@ let
 in
 rec{
   
-  rpcs3atts = builtins.fromJSON ( builtins.readFile ./rpcs3.json);
+  # rpcs3atts = builtins.fromJSON ( builtins.readFile ./rpcs3.json);
   rpcs3-new = pkgs.rpcs3.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {
         owner = "rpcs3";
         repo = "rpcs3";
-        rev = rpcs3atts.rev;
-        hash = rpcs3atts.hash;
+        rev = "2064bd87e37da1d0946f7c5b62f2d38003abff8e";
+        hash = "";
 
         postCheckout = ''
           cd $out/3rdparty

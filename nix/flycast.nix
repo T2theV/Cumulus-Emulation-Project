@@ -10,11 +10,11 @@ rec {
       src = pkgs.fetchFromGitHub {
         owner = "flyinghead";
         repo = "flycast";
-        rev = flycastatts.rev;
-        hash = flycastatts.hash;
+        rev = "ba5b3c71ecc966e52f698f41443e7cc9b81bf824";
+        hash = "";
         fetchSubmodules = true;
       };
       buildInputs = previousAttrs.buildInputs ++ [pkgs.systemd];
-      cmakeFlags = previousAttrs.cmakeFlags ++ [ "-DUSE_OPENGL=OFF" ]
+      cmakeFlags = previousAttrs.cmakeFlags ++ [ "-DUSE_OPENGL=OFF" ];
   });
 }

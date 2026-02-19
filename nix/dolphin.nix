@@ -4,7 +4,7 @@ let
   pkgs = import nixpkgs { config = {}; overlays = []; };
 in
 rec{
-  dolatts = builtins.fromJSON ( builtins.readFile ./dol.json);
+  # dolatts = builtins.fromJSON ( builtins.readFile ./dol.json);
   dolphin-new = pkgs.dolphin-emu.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {

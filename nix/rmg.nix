@@ -4,14 +4,14 @@ let
 in
 rec{
 
-  rmgatts = builtins.fromJSON ( builtins.readFile ./rmg.json);
+  # rmgatts = builtins.fromJSON ( builtins.readFile ./rmg.json);
   rmg-new = pkgs.rmg.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {
-        owner = rmgatts.owner;
-        repo = rmgatts.repo;
-        rev = rmgatts.rev;
-        hash = rmgatts.hash;
+        owner = "rosalie241";
+        repo = "RMG";
+        rev = "e9167db9ffbb16e10ac62a0a449dd6bfd124493a";
+        hash = "";
         fetchSubmodules = true;
       };
     patches = [ ];
