@@ -8,8 +8,8 @@ rec{
   dolphin-new = pkgs.dolphin-emu.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {
-        owner = dolphin-emu;
-        repo = dolphin;
+        owner = "dolphin-emu";
+        repo = "dolphin";
         rev = dolatts.rev;
         hash = dolatts.hash;
         fetchSubmodules = true;
