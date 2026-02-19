@@ -4,7 +4,7 @@ let
   pkgs = import nixpkgs { config = {}; overlays = []; };
 in
 rec {
-  flycastatts = builtins.fromJSON ( builtins.readFile ./dol.json);
+  flycastatts = builtins.fromJSON ( builtins.readFile ./flycast.json);
   flycast-new = pkgs.flycast.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = pkgs.fetchFromGitHub {
