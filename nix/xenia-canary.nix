@@ -14,6 +14,6 @@ rec{
         rev = "bc69b95db698efdcb4dcf36101b9c252d28f0c95";
         hash = "sha256-0jflmjEtY2RuJSaiCPTlhWCS0bQDMp9ZyILxmUxLvzk=";
       };
+    buildInputs = [pkgs.alsa-lib] ++ previousAttrs.buildInputs;
   });
-
 }
