@@ -1,0 +1,27 @@
+[     
+    
+    {
+        "name": "pcsx2",
+        "dockerfile": "progs/emulators/pcsx2.dockerfile",
+        "system" : "PlayStation 2",
+        "build_contexts": [
+            {"context-name":"build-base01",  "location": "docker-image://buildbase01"},
+            {"context-name":"base-sdl3",  "location": "docker-image://sdl3"}
+        ]
+    },
+    {
+        "name": "rmg",
+        "dockerfile": "progs/emulators/rmg.dockerfile",
+        "system" : "Nintendo 64"
+    },
+    {
+        "name": "flycast",
+        "dockerfile": "progs/emulators/flycast.dockerfile",
+        "system" : "Dreamcast"
+    },
+    {
+        "name": "xemu",
+        "dockerfile": "progs/emulators/xemu.dockerfile",
+        "system" : "Xbox"
+    }
+]

@@ -53,7 +53,7 @@ target "rpcs3-build" {
         build-base01 = "target:buildbase"
         base-sdl = "target:sdl"
         base-openal = "target:openal"
-        qt-base = "target:qt"
+        // qt-base = "target:qt"
     }
 }
 

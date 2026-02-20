@@ -1,0 +1,2 @@
+ACTION=="add", SUBSYSTEM=="input", RUN+="/usr/local/bin/docker_tty.sh 'added' '%E{DEVNAME}' '%M' '%m'"
+ACTION=="remove", SUBSYSTEM=="input", RUN+="/usr/local/bin/docker_tty.sh 'removed' '%E{DEVNAME}' '%M' '%m'"

@@ -2,35 +2,30 @@
 
 name: Build
 
-# Controls when the workflow will run
 on:
   pull_request:
     branches:
       - main 
-
-  # Allows you to run this workflow manually from the Actions tab
+  push:
+    branches:
+      - build-json
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build-builder:
-    # The type of runner that the job will run on
+    if: 0
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker Login
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.TIMSPAT }}
+      # - name: Docker Login
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.repository_owner }}
+      #     password: ${{ secrets.TIMSPAT }}
 
       - name: Build & Push Docker Image 
         uses: docker/build-push-action@v5
@@ -38,20 +33,40 @@ jobs:
           push: true
           target: build-base01
           tags: ghcr.io/t2thev/emubuilder
-          cache-from: ghcr.io/t2thev/bkbuilder 
-          cache-to: ghcr.io/t2thev/bkbuilder
+          # cache-from: ghcr.io/t2thev/bkbuilder 
+          # cache-to: ghcr.io/t2thev/bkbuilder
           file: progs/dependencies/buildbase.dockerfile
 
-  # This workflow contains a single job called "build"
-  build-dolphin:
-    needs: build-builder
-    # The type of runner that the job will run on
+  fill_emulist_variable:
+    outputs: 
+      EMULATOR_NAME: ${{ steps.emulator_name.outputs.name }}
+    
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: emulator_name
+        id: emulator_name
+        run: |
+          {
+            echo 'name<<EOF'
+              jq '. | map(.name)' emulators.json
+            echo 'EOF' 
+          } >> $GITHUB_OUTPUT
+
+  build-emulators:
+    needs: 
+      - fill_emulist_variable
+      # - build-builder
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        EMULATOR: ${{ fromJson(needs.fill_emulist_variable.outputs.EMULATOR_NAME) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -62,28 +77,38 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.TIMSPAT }}
+      
+      - name: Get Emulator Vars
+        id: get_emu_vars
+        run: |
+          export index=$(jq '. | map(.name == "${{ matrix.EMULATOR }}") | index(true)' emulators.json)
+          emulator_name=$(jq -r ".[$index].name" emulators.json)
+          emulator_dockerfile=$(jq -r ".[$index].dockerfile" emulators.json)
+          echo emulator_name=$emulator_name >> $GITHUB_OUTPUT
+          echo emulator_dockerfile=$emulator_dockerfile >> $GITHUB_OUTPUT
 
       - name: Build & Push Docker Image 
         uses: docker/build-push-action@v5
         with:
           push: false
-          target: dolphin-dist
-          tags: dolphin-build
-          outputs: type=docker,dest=/tmp/dolphin-build.tar
-          cache-from: ghcr.io/t2thev/bkdolphin
-          cache-to: ghcr.io/t2thev/bkdolphin
-          file: progs/emulators/dolphin.dockerfile
-          build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
+          # target: dolphin-dist
+          tags: ${{ steps.get_emu_vars.outputs.emulator_name }}-build
+          outputs: type=docker,dest=/tmp/${{ steps.get_emu_vars.outputs.emulator_name }}-build.tar
+          cache-from: ghcr.io/t2thev/cumulus-bkcache
+          cache-to: ghcr.io/t2thev/cumulus-bkcache
+          file: ${{ steps.get_emu_vars.outputs.emulator_dockerfile}}
+          # build-contexts: build-base01=docker-image://ghcr.io/t2thev/emubuilder:latest
         
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dolphin-build.tar
-          path: /tmp/dolphin-build.tar
+          name: ${{ steps.get_emu_vars.outputs.emulator_name }}-build.tar
+          path: /tmp/${{ steps.get_emu_vars.outputs.emulator_name }}-build.tar
 
   build-webtop:
+    if: 0
     runs-on: ubuntu-latest
-    needs: build-dolphin
+    needs: build-emulators
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -106,12 +131,12 @@ jobs:
           docker load --input /tmp/dolphin-build.tar
           docker image ls -a         
       
-      - name: Docker Login
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.TIMSPAT }}
+      # - name: Docker Login
+      #   uses: docker/login-action@v3
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.repository_owner }}
+      #     password: ${{ secrets.TIMSPAT }}
 
       - name: Build & Push Docker Image 
         uses: docker/build-push-action@v5
