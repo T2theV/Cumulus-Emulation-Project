@@ -1,0 +1,11 @@
+--- ./src/imgui/imgui_extension.cpp	2026-02-18 17:18:48.343841492 +0000
++++ ./src/imgui/imgui_extension.cpp	2026-02-18 17:19:20.063839366 +0000
+@@ -129,8 +129,6 @@
+ 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+ #if BOOST_OS_WINDOWS
+ 	io.ImeWindowHandle = mainWindow ? windowInfo.window_main.surface : windowInfo.window_pad.surface;
+-#else
+-	io.ImeWindowHandle = nullptr;
+ #endif
+ 
+ 	io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
