@@ -34,7 +34,7 @@ Open your browser and go to "http://localhost:3000" You'll see your emulation-re
 This is a compose file to run the image with more features.
 ```
 services:
-  emu:
+  emulation:
     image: emu-webtop:latest
     volumes:
       - /path/to/config:/config
