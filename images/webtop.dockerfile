@@ -127,79 +127,89 @@
   libslirp0 \
   libminizip1 \
   libsdl2-net-dev
-  
-    
-    # RUN --mount=type=cache,target=/root/.cache/pip python3 -m pip install pdftotext
-    
-      # Dolphin Emulator
-      RUN --mount=type=bind,from=dolphin-dist,source=/,target=/dolphin,rw \
-        cd /dolphin/build && make install
-    
-      #RCPS3 
-      # RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd /qt6/qt6_build && cmake --install .
-      #RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
-      #RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
-           # cd/ /rpcs3_build/ && make install
-      RUN --mount=type=bind,from=sdl3-dist,source=/app,target=/app,rw \
-        cd /app/SDL/build && make install
-      COPY --from=rpcs3-dist /usr/local/Qt /usr/local/Qt
-      COPY --from=rpcs3-dist /rpcs3_build/bin/ /rpcs3/
-      ENV PATH=$PATH:/rpcs3
 
-      #PCSX2
-      COPY --from=pcsx2-dist /opt/pcsx2/deps /opt/pcsx2/deps
-      COPY --from=pcsx2-dist /opt/pcsx2/build/bin /pcsx2
-      ENV PATH=$PATH:/pcsx2
-      RUN <<EOT bash
-        echo "/opt/pcsx2/deps" > /etc/ld.so.conf.d/pcsx2.conf
-        ldconfig
+RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+--mount=type=cache,target=/var/lib/apt,sharing=locked \
+apt update && apt-get --no-install-recommends install -y \
+libstdc++6 wget
+RUN <<EOT
+  wget https://apt.llvm.org/llvm.sh
+  chmod +x llvm.sh
+  ./llvm.sh 20
+EOT
+
+ADD https://github.com/LizardByte/Sunshine/releases/download/v2025.122.141614/sunshine-ubuntu-24.04-amd64.deb /config/sunshine.deb
+RUN apt install -y /config/sunshine.deb && rm /config/sunshine.deb
+COPY images/webtop-files/kasmrun.run /etc/s6-overlay/s6-rc.d/svc-kasmvnc/run
+# COPY images/webtop-files/svc-sunshine /etc/s6-overlay/s6-rc.d/svc-sunshine
+# RUN touch /etc/s6-overlay/s6-rc.d/user/contents.d/svc-sunshine
+COPY images/webtop-files/defaults/startwm.sh /defaults/startwm.sh
+
+COPY images/webtop-files/config /etc/cumulus-emu/config
+COPY images/webtop-files/local /etc/cumulus-emu/local
+COPY udev /udev
+COPY images/webtop-files/emu-settings/overall.sh /etc/cumulus-emu/file-init.sh
+
+RUN mkdir -p /etc/s6-overlay/s6-rc.d/cumulus/dependencies.d
+RUN echo "/etc/cumulus-emu/file-init.sh" >> /etc/s6-overlay/s6-rc.d/cumulus/up
+RUN chmod +x /etc/cumulus-emu/file-init.sh
+RUN echo "oneshot" >> /etc/s6-overlay/s6-rc.d/cumulus/type
+RUN touch /etc/s6-overlay/s6-rc.d/user/contents.d/cumulus
+RUN touch /etc/s6-overlay/s6-rc.d/cumulus/dependencies.d/init-config-end
+
+
+# Dolphin Emulator
+RUN --mount=type=bind,from=dolphin-dist,source=/,target=/dolphin,rw \
+  cd /dolphin/build && make install
+
+#RCPS3 
+# RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd /qt6/qt6_build && cmake --install .
+#RUN --mount=type=bind,from=qt-base,source=/qt6,target=/qt6,rw cd qt6/qt6-build && cmake --install .
+#RUN --mount=type=bind,from=rpcs3,source=/rpcs3_build,target=/rpcs3_build \
+      # cd/ /rpcs3_build/ && make install
+RUN --mount=type=bind,from=sdl3-dist,source=/app,target=/app,rw \
+  cd /app/SDL/build && make install
+COPY --from=rpcs3-dist /usr/local/Qt /usr/local/Qt
+COPY --from=rpcs3-dist /rpcs3_build/bin/ /rpcs3/
+ENV PATH=$PATH:/rpcs3
+
+#PCSX2
+COPY --from=pcsx2-dist /opt/pcsx2/deps /opt/pcsx2/deps
+COPY --from=pcsx2-dist /opt/pcsx2/build/bin /pcsx2
+ENV PATH=$PATH:/pcsx2
+RUN <<EOT bash
+  echo "/opt/pcsx2/deps" > /etc/ld.so.conf.d/pcsx2.conf
+  ldconfig
 EOT
 
 
-      #N64 RMG
-      COPY --from=n64-dist /usr/local/Qt /usr/local/Qt
-      RUN --mount=type=bind,from=n64-dist,source=/RMG,target=/RMG,rw \
-        cd RMG/build && cmake --install . --prefix="/usr"
-      RUN <<EOT bash
-        echo "/usr/local/Qt/6.8.2/gcc_64/lib" > /etc/ld.so.conf.d/qt.conf
-        ldconfig
+#N64 RMG
+COPY --from=n64-dist /usr/local/Qt /usr/local/Qt
+RUN --mount=type=bind,from=n64-dist,source=/RMG,target=/RMG,rw \
+  cd RMG/build && cmake --install . --prefix="/usr"
+RUN <<EOT bash
+  echo "/usr/local/Qt/6.8.2/gcc_64/lib" > /etc/ld.so.conf.d/qt.conf
+  ldconfig
 EOT
 
-      #XEmu XBOX
-      COPY --from=xbox-dist /xemu/dist /xemu
-      ENV PATH=$PATH:/xemu
+#XEmu XBOX
+COPY --from=xbox-dist /xemu/dist /xemu
+ENV PATH=$PATH:/xemu
 
-      #Flycast Dreamcast
-      COPY --from=dreamcast-dist /flycast/build/flycast /flycast/flycast
-      ENV PATH=$PATH:/flycast
+#Flycast Dreamcast
+COPY --from=dreamcast-dist /flycast/build/flycast /flycast/flycast
+ENV PATH=$PATH:/flycast
 
-      #duckstation
-      COPY --from=ps1-dist /duckstation/build/deps /duckstation/build/deps
-      COPY --from=ps1-dist /duckstation/build/bin /duckstation
-      ENV PATH=$PATH:/duckstation
+#duckstation
+COPY --from=ps1-dist /duckstation/build/deps /duckstation/build/deps
+COPY --from=ps1-dist /duckstation/build/bin /duckstation
+ENV PATH=$PATH:/duckstation
 
-      #ESDE
-      RUN --mount=type=bind,from=esde-dist,source=/build,target=/build,rw \
-        --mount=type=bind,from=esde-dist,source=/esde,target=/esde,rw \
-        cd /build && make install
-  
-  
-    RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  
-    RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt update && apt-get --no-install-recommends install -y \
-    libstdc++6 wget
-    RUN <<EOT
-      wget https://apt.llvm.org/llvm.sh
-      chmod +x llvm.sh
-      ./llvm.sh 20
-EOT
+#ESDE
+RUN --mount=type=bind,from=esde-dist,source=/build,target=/build,rw \
+  --mount=type=bind,from=esde-dist,source=/esde,target=/esde,rw \
+  cd /build && make install
 
-    ADD https://github.com/LizardByte/Sunshine/releases/download/v2025.122.141614/sunshine-ubuntu-24.04-amd64.deb /config/sunshine.deb
-    RUN apt install -y /config/sunshine.deb && rm /config/sunshine.deb
-    COPY images/webtop-files/kasmrun.run /etc/s6-overlay/s6-rc.d/svc-kasmvnc/run
-    # COPY images/webtop-files/svc-sunshine /etc/s6-overlay/s6-rc.d/svc-sunshine
-    # RUN touch /etc/s6-overlay/s6-rc.d/user/contents.d/svc-sunshine
-    COPY images/webtop-files/defaults/startwm.sh /defaults/startwm.sh
       ######### End Customizations ###########
