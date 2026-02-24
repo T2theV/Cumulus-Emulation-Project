@@ -4,8 +4,10 @@
 curl can utilize github API's to start to build a json
 
 ## Hash calculation
-This gives the hash calulation
+This gives the hash calulation:
+```sh
 nurl -e '(import <nixpkgs> { }).${{ pkg }}.src.overrideAttrs(_:{tag=0; rev=${{ rev }};})'
+```
 
 This output is substituted into the hash output
 
