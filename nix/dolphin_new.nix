@@ -7,7 +7,7 @@ rec{
   # dolatts = builtins.fromJSON ( builtins.readFile ./dol.json);
   dolphin-src = pkgs.dolphin-emu.src.overrideAttrs (finalAttrs: previousAttrs: {
         tag = 0;
-        rev = "9323074ada4b1d372809dc71ed092efe8d0e4c8e";
+        rev = "d58e7ca9325217574d84d961b824e0acbf2f67e9";
         hash = pkgs.lib.fakeHash;
         #"sha256-i13c+ccwgkVgXfSRAtaZvh7lz+FvNiFbWzenvOc/V/A=";
   });
