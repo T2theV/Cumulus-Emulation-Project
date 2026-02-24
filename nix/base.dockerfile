@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM lscr.io/linuxserver/xvfb:debiantrixie AS xvfb
+FROM lscr.io/linuxserver/xvfb:ubuntunoble AS xvfb
 FROM ghcr.io/linuxserver/baseimage-alpine:3.22 AS frontend
 
 RUN \
@@ -13,10 +13,10 @@ RUN \
 RUN \
   echo "**** ingest code ****" && \
   git clone \
-    https://github.com/T2theV/selkies.git \
+    https://github.com/selkies-project/selkies.git \
     /src && \
   cd /src && \
-  git checkout -f 45bda6358254525eab058ff489bc422aae4a752a
+  git checkout -f cf289a88106097239d320f5b64d8d87cb5028033
 
 RUN \
   echo "**** build shared core library ****" && \
@@ -41,7 +41,7 @@ RUN \
   done
 
 # Runtime stage
-FROM ghcr.io/linuxserver/baseimage-debian:trixie
+FROM ghcr.io/linuxserver/baseimage-ubuntu:noble
 
 # set version label
 ARG BUILD_DATE
@@ -69,10 +69,10 @@ RUN \
   echo "**** enable locales ****" && \
   sed -i \
     '/locale/d' \
-    /etc/dpkg/dpkg.cfg.d/docker && \
+    /etc/dpkg/dpkg.cfg.d/excludes && \
   echo "**** install deps ****" && \
-  curl -fsSL https://download.docker.com/linux/debian/gpg | tee /usr/share/keyrings/docker.asc >/dev/null && \
-  echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.asc] https://download.docker.com/linux/debian trixie stable" > /etc/apt/sources.list.d/docker.list && \
+  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | tee /usr/share/keyrings/docker.asc >/dev/null && \
+  echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker.asc] https://download.docker.com/linux/ubuntu noble stable" > /etc/apt/sources.list.d/docker.list && \
   curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
@@ -88,8 +88,6 @@ RUN \
     docker-compose-plugin \
     dunst \
     file \
-    firmware-linux-nonfree \
-    firmware-misc-nonfree \
     fonts-noto-cjk \
     fonts-noto-color-emoji \
     fonts-noto-core \
@@ -113,6 +111,7 @@ RUN \
     libglu1-mesa \
     libgnutls30 \
     libgtk-3.0 \
+    libjpeg-turbo8 \
     libnginx-mod-http-fancyindex \
     libnotify-bin \
     libnss3 \
@@ -127,6 +126,7 @@ RUN \
     libwayland-egl1 \
     libwayland-server0 \
     libx11-6 \
+    libx264-164 \
     libxau6 \
     libxcb1 \
     libxcb-icccm4 \
@@ -155,10 +155,12 @@ RUN \
     openssl \
     pciutils \
     procps \
+    psmisc \
     pulseaudio \
     pulseaudio-utils \
     python3 \
     python3-venv \
+    software-properties-common \
     ssl-cert \
     stterm \
     sudo \
@@ -193,13 +195,14 @@ RUN \
     xterm \
     xutils \
     xvfb \
-    zlib1g && \
+    zlib1g \
+    zstd && \
   echo "**** install selkies ****" && \
   SELKIES_RELEASE=$(curl -sX GET "https://api.github.com/repos/selkies-project/selkies/releases/latest" \
     | awk '/tag_name/{print $4;exit}' FS='[""]') && \
   curl -o \
     /tmp/selkies.tar.gz -L \
-    "https://github.com/T2theV/selkies/archive/45bda6358254525eab058ff489bc422aae4a752a.tar.gz" && \
+    "https://github.com/selkies-project/selkies/archive/cf289a88106097239d320f5b64d8d87cb5028033.tar.gz" && \
   cd /tmp && \
   tar xf selkies.tar.gz && \
   cd selkies-* && \
@@ -270,6 +273,19 @@ RUN \
   chmod +x /usr/local/bin/dind && \
   echo 'hosts: files dns' > /etc/nsswitch.conf && \
   usermod -aG docker abc && \
+  echo "**** libva hack ****" && \
+  mkdir /tmp/libva && \
+  curl -o \
+    /tmp/libva/libva.deb -L \
+    "https://launchpad.net/ubuntu/+source/libva/2.22.0-3ubuntu2/+build/30591127/+files/libva2_2.22.0-3ubuntu2_amd64.deb" && \
+  cd /tmp/libva && \
+  ar x libva.deb && \
+  tar xf data.tar.zst && \
+  rm -f \
+    /usr/lib/x86_64-linux-gnu/libva.so.2* && \
+  cp -a \
+    usr/lib/x86_64-linux-gnu/libva.so.2* \
+    /usr/lib/x86_64-linux-gnu/ && \
   echo "**** locales ****" && \
   for LOCALE in $(curl -sL https://raw.githubusercontent.com/thelamer/lang-stash/master/langs); do \
     localedef -i $LOCALE -f UTF-8 $LOCALE.UTF-8; \
