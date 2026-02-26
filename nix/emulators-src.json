@@ -1,0 +1,30 @@
+[
+    {
+        "name": "Dolphin",
+        "nix-pkg": "dolphin-emu"
+    },
+    {
+        "name": "flycast",
+        "nix-pkg": "flycast"
+    },
+    {
+        "name": "PCSX2",
+        "nix-pkg": "pcsx2"
+    },
+    {
+        "name": "Rosaline Mupen GUI",
+        "nix-pkg": "rmg"
+    },
+    {
+        "name": "RPCS3",
+        "nix-pkg": "rpcs3"
+    },
+    {
+        "name": "Xemu",
+        "nix-pkg": "xemu"
+    },
+    {
+        "name": "Xenia",
+        "nix-pkg": "xenia-canary"
+    }
+]
