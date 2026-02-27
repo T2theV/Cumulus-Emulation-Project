@@ -1,30 +1,45 @@
 [
     {
         "name": "Dolphin",
-        "nix-pkg": "dolphin-emu"
+        "nix-pkg": "dolphin-emu",
+        "owner":"dolphin-emu",
+        "repo": "dolphin"
     },
     {
         "name": "flycast",
-        "nix-pkg": "flycast"
+        "nix-pkg": "flycast",
+        "owner":"flyinghead",
+        "repo": "flycast"
+
     },
     {
         "name": "PCSX2",
-        "nix-pkg": "pcsx2"
+        "nix-pkg": "pcsx2",
+        "owner":"pcsx2",
+        "repo": "pcsx2"
     },
     {
         "name": "Rosaline Mupen GUI",
-        "nix-pkg": "rmg"
+        "nix-pkg": "rmg",
+        "owner":"rosaline241",
+        "repo": "rmg"
     },
     {
         "name": "RPCS3",
-        "nix-pkg": "rpcs3"
+        "nix-pkg": "rpcs3",
+        "owner":"rpcs3",
+        "repo": "rpcs3"
     },
     {
         "name": "Xemu",
-        "nix-pkg": "xemu"
+        "nix-pkg": "xemu",
+        "owner":"xemu-project",
+        "repo": "xemu"
     },
     {
         "name": "Xenia",
-        "nix-pkg": "xenia-canary"
+        "nix-pkg": "xenia-canary",
+        "owner":"xenia-canary",
+        "repo": "xenia-canary"
     }
 ]

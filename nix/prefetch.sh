@@ -11,5 +11,8 @@
 # nurl -e '(import <nixpkgs> { }).xemu.src.overrideAttrs(_:{tag=0; rev="5aeacacfeb7a28ad7d5a9ecab9978115804148dc";})' > xemu.hash &
 # nurl -e '(import <nixpkgs> { }).xenia-canary.src.overrideAttrs(_:{tag=0; rev="bc69b95db698efdcb4dcf36101b9c252d28f0c95";})' > xenia.hash &
 
-nurl -e "(import <nixpkgs> { })."${1}".src.overrideAttrs(_:{tag=0; rev=\"${2}\";})" > ${1}.hash &
-wait
+REV=$(jq '.rev' ${1}-out.json)
+
+HASH=$(nurl -e "(import <nixpkgs> { })."${1}".src.overrideAttrs(_:{tag=0; rev=${REV};})")
+
+jq --arg substitute $HASH '. += { "hash" : $substitute }' ${1}-out.json > ${1}-full-out.json
