@@ -11,8 +11,6 @@ rec{
   rpcs3-new = pkgs.rpcs3.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = rpcs3-src;
-      buildInputs = [ pkgs.protobuf ] ++ previousAttrs.buildInputs;
-      cmakeFlags = [ (pkgs.lib.cmakeBool "USE_SYSTEM_PROTOBUF" true) ] ++ previousAttrs.cmakeFlags;
   });
 
 }
