@@ -21,20 +21,14 @@
     {
         "name": "Rosaline Mupen GUI",
         "nixpkg": "rmg",
-        "owner":"rosaline241",
-        "repo": "rmg"
+        "owner":"Rosalie241",
+        "repo": "RMG"
     },
     {
         "name": "RPCS3",
         "nixpkg": "rpcs3",
         "owner":"rpcs3",
         "repo": "rpcs3"
-    },
-    {
-        "name": "Xemu",
-        "nixpkg": "xemu",
-        "owner":"xemu-project",
-        "repo": "xemu"
     },
     {
         "name": "Xenia",
