@@ -2,7 +2,7 @@
 #! nix-shell -i bash
 #! nix-shell -p bash nurl curl jq
 
-nix-channel --update
+#nix-channel --update
 # nurl -e '(import <nixpkgs> { }).dolphin-emu.src.overrideAttrs(_:{tag=0; rev="9323074ada4b1d372809dc71ed092efe8d0e4c8e";})' > dolphin-emu.hash &
 # nurl -e '(import <nixpkgs> { }).flycast.src.overrideAttrs(_:{tag=0; rev="ba5b3c71ecc966e52f698f41443e7cc9b81bf824";})' > flycast.hash &
 # nurl -e '(import <nixpkgs> { }).pcsx2.src.overrideAttrs(_:{tag=0; rev="b7fa45ee76bb47e02ce78ebd674d3dd46d519689";})' > pcsx2.hash &
