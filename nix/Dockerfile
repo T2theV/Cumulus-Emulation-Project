@@ -1,5 +1,5 @@
 #FROM lscr.io/linuxserver/webtop:ubuntu-mate
-FROM ghcr.io/linuxserver/baseimage-selkies:ubuntunoble
+FROM docker pull ghcr.io/t2thev/t2thev-selkies:latest
 
 RUN apt update && apt install -y xz-utils mesa-vulkan-drivers
 
