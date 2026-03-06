@@ -44,7 +44,7 @@ RUN <<EOF
   echo "alias dolphin-emu='nixVulkanIntel dolphin-emu'" >> .bashrc
   echo "alias flycast='nixVulkanIntel flycast'" >> .bashrc
   echo "alias pcsx2-qt='nixVulkanIntel pcsx2-qt'" >> .bashrc
-  echo "alias rpcs3='nixVulkanIntel rpcs3'">> .bashrc
+  echo "alias rpcs3='QT_QPA_PLATFORM=xcb nixVulkanIntel rpcs3'">> .bashrc
   echo "alias RMG='nixVulkanIntel RMG'" >> .bashrc
   echo "alias xenia_canary='nixVulkanIntel xenia_canary'" >> .bashrc
 EOF
