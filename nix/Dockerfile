@@ -49,5 +49,6 @@ RUN <<EOF
   echo "alias xenia_canary='nixVulkanIntel xenia_canary'" >> .bashrc
 EOF
 
+ENV PIXELFLUX_WAYLAND=true
 
 RUN rm -rf /config/.cache
