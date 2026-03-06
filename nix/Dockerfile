@@ -43,10 +43,10 @@ nix-env -i -f ./xenia-canary.nix
 RUN <<EOF
   echo "dolphin-emu='nixVulkanIntel dolphin-emu'" >> .bashrc
   echo "flycast='nixVulkanIntel flycast'" >> .bashrc
-  echo "pcsx2='nixVulkanIntel pcsx2'" >> .bashrc
+  echo "pcsx2-qt='nixVulkanIntel pcsx2-qt'" >> .bashrc
   echo "rpcs3='nixVulkanIntel rpcs3'">> .bashrc
   echo "RMG='nixVulkanIntel RMG'" >> .bashrc
-  echo "xenia-canary='nixVulkanIntel xenia-canary'" >> .bashrc
+  echo "xenia_canary='nixVulkanIntel xenia_canary'" >> .bashrc
 EOF
 
 
