@@ -5,11 +5,11 @@ in
 rec{
 
   xeniaatts = builtins.fromJSON ( builtins.readFile ./xenia-canary-full-out.json);
-  xc-src = pkgs.xenia-canary.src.overrideAttrs(finalAttrs: previousAttrs {
+  xc-src = pkgs.xenia-canary.src.overrideAttrs(finalAttrs: previousAttrs: {
     hash = xeniaatts.hash;
   });
   xenia-new = pkgs.xenia-canary.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
-      src = xeniaatts.hash
+      src = xc-src;
   });
 }

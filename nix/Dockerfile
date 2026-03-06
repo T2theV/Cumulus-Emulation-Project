@@ -1,5 +1,5 @@
 #FROM lscr.io/linuxserver/webtop:ubuntu-mate
-FROM FROM ghcr.io/linuxserver/baseimage-selkies:ubuntunoble
+FROM ghcr.io/linuxserver/baseimage-selkies:ubuntunoble
 
 RUN apt update && apt install -y xz-utils mesa-vulkan-drivers
 
@@ -23,7 +23,7 @@ nix-env -iA nixgl.nixVulkanIntel
 
 COPY ./*.sh .
 COPY ./*.nix .
-
+COPY ./emulators-src.json .
 RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 nix-channel --update && \
 ./localbuild.sh && \
