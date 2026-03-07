@@ -33,7 +33,9 @@ nix-channel --update && \
 nix-build dolphin.nix flycast.nix pcsx2.nix && \
 nix-build rmg.nix rpcs3.nix && \
 nix-build xemu.nix xenia-canary.nix && \
+nix-build eden.nix && \
 #RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
+nix-env -i -f ./eden.nix && \
 nix-env -i -f ./dolphin.nix && \
 nix-env -i -f ./flycast.nix && \
 nix-env -i -f ./pcsx2.nix && \
@@ -44,6 +46,7 @@ nix-env -i -f ./xenia-canary.nix && \
 nix-store --gc
 
 RUN <<EOF
+  echo "alias eden='nixVulkanIntel eden'" >> .bashrc
   echo "alias dolphin-emu='nixVulkanIntel dolphin-emu'" >> .bashrc
   echo "alias flycast='nixVulkanIntel flycast'" >> .bashrc
   echo "alias pcsx2-qt='nixVulkanIntel pcsx2-qt'" >> .bashrc

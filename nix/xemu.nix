@@ -13,9 +13,6 @@ rec {
       });
       configureFlags = previousAttrs.configureFlags ++ [
           "--disable-opengl"
-          "--enable-gtk"
       ];
-      buildInputs = previousAttrs.buildInputs ++ [pkgs.pixman];
-      nativeBuildInputs  = previousAttrs.nativeBuildInputs  ++ [pkgs.pixman];
   });
 }
