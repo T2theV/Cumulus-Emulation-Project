@@ -25,6 +25,7 @@ nix-env -iA nixgl.nixVulkanIntel
 
 COPY ./*.sh .
 COPY ./*.nix .
+COPY ./*.patch .
 COPY ./emulators-src.json .
 RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 nix-channel --update && \
