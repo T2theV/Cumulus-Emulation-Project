@@ -11,8 +11,11 @@ rec {
         rev = "5aeacacfeb7a28ad7d5a9ecab9978115804148dc";
         hash = "sha256-oC44EMr71J6abDeGXtFAK68Ti/zi+CerxjFRALOoCwE=";
       });
-      configureFlags = previousAttrs.configureFlags ++ [
-          "--disable-opengl"
-      ];
+#      configureFlags = previousAttrs.configureFlags ++ [
+ #         "--disable-opengl"
+#          "--enable-gtk"
+  #        "--disable-sdl"
+   #   ];
+    #  nativeBuildInputs = [ pkgs.pixman ] ++ previousAttrs.nativeBuildInputs;
   });
 }
