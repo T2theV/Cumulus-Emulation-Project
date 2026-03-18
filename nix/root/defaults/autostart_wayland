@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [ -n "$RUN_EMU" ]; then
+    /etc/cumulus-emu/file-init.sh
     $RUN_EMU
 else
     foot

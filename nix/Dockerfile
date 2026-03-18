@@ -6,7 +6,7 @@ RUN apt update && apt install -y --no-install-recommends \
  xz-utils mesa-vulkan-drivers && \
  apt clean && rm -rf /var/lib/apt/lists/*
 
-ADD /root/defaults/autostart_wayland /defaults/autostart_wayland
+COPY /root/defaults/autostart_wayland /defaults/autostart_wayland
 
 WORKDIR /config
 
@@ -60,6 +60,12 @@ nix-env -i -f ./xenia-canary.nix
 #  echo "alias RMG='nixVulkanIntel RMG'" >> .bashrc
 #  echo "alias xenia_canary='nixVulkanIntel xenia_canary'" >> .bashrc
 #EOF
+
+COPY /root/config /etc/cumulus-emu/config
+COPY /root/local /etc/cumulus-emu/local
+COPY /root/emu-settings/overall.sh /etc/cumulus-emu/file-init.sh
+RUN chmod +x /etc/cumulus-emu/file-init.sh
+
 
 ENV PIXELFLUX_WAYLAND=true
 
