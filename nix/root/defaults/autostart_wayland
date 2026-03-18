@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -n "$RUN_EMU" ]; then
+    $RUN_EMU
+else
+    foot
+fi

@@ -6,6 +6,8 @@ RUN apt update && apt install -y --no-install-recommends \
  xz-utils mesa-vulkan-drivers && \
  apt clean && rm -rf /var/lib/apt/lists/*
 
+ADD /root/defaults/autostart_wayland /defaults/autostart_wayland
+
 WORKDIR /config
 
 
