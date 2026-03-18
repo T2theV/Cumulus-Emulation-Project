@@ -8,7 +8,12 @@ RUN apt update && apt install -y --no-install-recommends \
 
 COPY /root/defaults/autostart_wayland /defaults/autostart_wayland
 
-WORKDIR /config
+COPY /root/config /etc/cumulus-emu/config
+COPY /root/local /etc/cumulus-emu/local
+COPY /root/overall.sh /etc/cumulus-emu/file-init.sh
+RUN chmod +x /etc/cumulus-emu/file-init.sh
+
+WORKDIR /nixbuild
 
 
 #USER abc
@@ -61,13 +66,8 @@ nix-env -i -f ./xenia-canary.nix
 #  echo "alias xenia_canary='nixVulkanIntel xenia_canary'" >> .bashrc
 #EOF
 
-COPY /root/config /etc/cumulus-emu/config
-COPY /root/local /etc/cumulus-emu/local
-COPY /root/emu-settings/overall.sh /etc/cumulus-emu/file-init.sh
-RUN chmod +x /etc/cumulus-emu/file-init.sh
-
-
 ENV PIXELFLUX_WAYLAND=true
 
 RUN rm -rf /config/.cache
 
+WORKDIR /config
