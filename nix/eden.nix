@@ -6,7 +6,7 @@ in
 rec{
   #edenatts = builtins.fromJSON ( builtins.readFile ./eden-full-out.json);
   eden-src = pkgs.eden.src.overrideAttrs(finalAttrs: previousAttrs: { 
-   hash = "sha256-rpb+bw0B8FGtN0Hxvr+cITxcXKukjvZOQ2SDqtoM5Gw=";
+   hash = "sha256-MFIbhPjI4FvB0dSCgLTmMGBtSOUHbAZfQEQTGKQCBLw=";
 #edenatts.hash;
   });
   eden-new = pkgs.eden.overrideAttrs (finalAttrs: previousAttrs: {

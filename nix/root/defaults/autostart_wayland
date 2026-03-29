@@ -1,9 +1,2 @@
-#!/bin/bash
-
-if [ -n "$RUN_EMU" ]; then
-    /etc/cumulus-emu/file-init.sh
-    sleep 2s
-    /config/.nix-profile/bin/$RUN_EMU
-else
-    foot
-fi
+. /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
+foot ${RUN_EMU}
