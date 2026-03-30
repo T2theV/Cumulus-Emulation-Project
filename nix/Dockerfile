@@ -52,9 +52,8 @@ nix-env -i -f ./pcsx2.nix && \
 nix-env -i -f ./rmg.nix && \
 nix-env -i -f ./rpcs3.nix && \
 nix-env -i -f ./xemu.nix && \
-nix-env -i -f ./xenia-canary.nix
-# && \
-#nix-store --gc
+nix-env -i -f ./xenia-canary.nix && \
+nix-store --gc
 
 #RUN <<EOF
 #  echo "alias eden='nixVulkanIntel eden'" >> .bashrc
