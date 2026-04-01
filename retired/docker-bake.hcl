@@ -1,17 +1,9 @@
 target "default" {
-    context = "."
-    dockerfile = "images/webtop.dockerfile"
-    tags = ["emu-webtop:latest"]
+    context = "nix"
+    dockerfile = "Dockerfile"
+    tags = ["testemunix:latest"]
     contexts = {
-        dolphin-dist = "target:dolphin-build"
-        rpcs3-dist = "target:rpcs3-build"
         esde-dist = "target:esde-build"
-        pcsx2-dist = "target:pcsx2-build"
-        sdl3-dist = "target:sdl3"
-        n64-dist = "target:n64-build"
-        xbox-dist = "target:xbox-build"
-        dreamcast-dist = "target:flycast-build"
-        ps1-dist = "target:duckstation-build"
     }
 }
 

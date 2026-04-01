@@ -1,20 +1,15 @@
 # default.nix
 let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
-  pkgs = import nixpkgs { config = {}; overlays = []; };
+  pkgs = import nixpkgs { config = {}; overlays = [(import ./flycast-overlay.nix)]; };
 in
 rec {
-  #flycastatts = builtins.fromJSON ( builtins.readFile ./flycast.json);
+  flycastatts = builtins.fromJSON ( builtins.readFile ./flycast-full-out.json);
+  flycast-src = pkgs.flycast.src.overrideAttrs(finalAttrs: previousAttrs: {
+    hash = flycastatts.hash;
+  });
   flycast-new = pkgs.flycast.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
-      src = pkgs.fetchFromGitHub {
-        owner = "flyinghead";
-        repo = "flycast";
-        rev = "ba5b3c71ecc966e52f698f41443e7cc9b81bf824";
-        hash = "sha256-tbq+NgbZDKMg0K0cWF1+7h80QTaAaO5BD9nf94z5fc0=";
-        fetchSubmodules = true;
-      };
-      buildInputs = previousAttrs.buildInputs ++ [pkgs.systemd];
-      cmakeFlags = previousAttrs.cmakeFlags ++ [ "-DUSE_OPENGL=OFF" ];
+      src = flycast-src;
   });
 }

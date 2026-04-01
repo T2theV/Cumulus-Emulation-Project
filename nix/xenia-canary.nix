@@ -1,19 +1,15 @@
 let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
-  pkgs = import nixpkgs { config = {}; overlays = []; };
+  pkgs = import nixpkgs { config = {}; overlays = [(import ./xenia-canary-overlay.nix)]; };
 in
 rec{
 
-  # xeniaatts = builtins.fromJSON ( builtins.readFile ./xenia.json);
+  xeniaatts = builtins.fromJSON ( builtins.readFile ./xenia-canary-full-out.json);
+  xc-src = pkgs.xenia-canary.src.overrideAttrs(finalAttrs: previousAttrs: {
+    hash = xeniaatts.hash;
+  });
   xenia-new = pkgs.xenia-canary.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
-      src = pkgs.fetchFromGitHub {
-        owner = "xenia-canary";
-        repo = "xenia-canary";
-        fetchSubmodules = true;
-        rev = "bc69b95db698efdcb4dcf36101b9c252d28f0c95";
-        hash = "sha256-0jflmjEtY2RuJSaiCPTlhWCS0bQDMp9ZyILxmUxLvzk=";
-      };
-    buildInputs = [pkgs.alsa-lib] ++ previousAttrs.buildInputs;
+      src = xc-src;
   });
 }

@@ -1,2 +1,4 @@
-**.json
+**-out.json
 !docs/**
+**.hash
+!**-src.json

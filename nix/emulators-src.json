@@ -1,0 +1,39 @@
+[
+    {
+        "name": "Dolphin",
+        "nixpkg": "dolphin-emu",
+        "owner":"dolphin-emu",
+        "repo": "dolphin"
+    },
+    {
+        "name": "flycast",
+        "nixpkg": "flycast",
+        "owner":"flyinghead",
+        "repo": "flycast"
+
+    },
+    {
+        "name": "PCSX2",
+        "nixpkg": "pcsx2",
+        "owner":"pcsx2",
+        "repo": "pcsx2"
+    },
+    {
+        "name": "Rosaline Mupen GUI",
+        "nixpkg": "rmg",
+        "owner":"Rosalie241",
+        "repo": "RMG"
+    },
+    {
+        "name": "RPCS3",
+        "nixpkg": "rpcs3",
+        "owner":"rpcs3",
+        "repo": "rpcs3"
+    },
+    {
+        "name": "Xenia",
+        "nixpkg": "xenia-canary",
+        "owner":"xenia-canary",
+        "repo": "xenia-canary"
+    }
+]

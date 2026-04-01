@@ -1,18 +1,15 @@
 # default.nix
 let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
-  pkgs = import nixpkgs { config = {}; overlays = []; };
+  pkgs = import nixpkgs { config = {}; overlays = [(import ./pcsx2-overlay.nix)]; };
 in
 rec{
-  #pcsx2atts = builtins.fromJSON ( builtins.readFile ./pcsx2.json);
+  pcsx2atts = builtins.fromJSON ( builtins.readFile ./pcsx2-full-out.json);
+  pcsx2-src = pkgs.pcsx2.src.overrideAttrs(finalAttrs: previousAttrs: {
+        hash = pcsx2atts.hash;
+  });
   pcsx2-new = pkgs.pcsx2.overrideAttrs (finalAttrs: previousAttrs: {
       version = "99.99.99";
-      src = pkgs.fetchFromGitHub {
-        owner = "pcsx2";
-        repo = "pcsx2";
-        rev = "b7fa45ee76bb47e02ce78ebd674d3dd46d519689";
-        hash = "sha256-XLiN3iIc/fi0OJM1Ip0tfSShGVQunuJjpdeH5zlX8WM=";
-      };
-    postPatch = "";
+      src = pcsx2-src;
   });
 }
