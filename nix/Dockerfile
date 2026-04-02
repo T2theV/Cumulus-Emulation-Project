@@ -56,8 +56,8 @@ nix-env -i -f ./xemu.nix && \
 nix-env -i -f ./xenia-canary.nix && \
 nix-store --gc
 
-RUN cd /usr/share/selkies/selkies-dashboard/src/ && patch /nixbuild/universalgamepad.patch
-RUN cd /usr/share/selkies/selkies-dashboard-wish/src/ && patch /nixbuild/universalgamepad.patch
+RUN patch /usr/share/selkies/selkies-dashboard/src/universalTouchGamepad.js /nixbuild/universalgamepad.patch
+RUN patch /usr/share/selkies/selkies-dashboard-wish/src/universalTouchGamepad.js /nixbuild/universalgamepad.patch
 
 ENV PIXELFLUX_WAYLAND=true
 
