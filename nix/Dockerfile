@@ -1,9 +1,9 @@
-#FROM lscr.io/linuxserver/webtop:ubuntu-mate
-FROM ghcr.io/t2thev/t2thev-selkies:latest
+FROM ghcr.io/linuxserver/baseimage-selkies:ubuntunoble
+
 
 RUN apt update && apt install -y --no-install-recommends \
 #  build-essential clang-format git cmake gettext libharfbuzz-dev libicu-dev libsdl2-dev libavcodec-dev libavfilter-dev libavformat-dev libavutil-dev libfreeimage-dev libfreetype6-dev libgit2-dev libcurl4-openssl-dev libpugixml-dev libasound2-dev libbluetooth-dev libgl1-mesa-dev libpoppler-cpp-dev \
- xz-utils mesa-vulkan-drivers && \
+ xz-utils mesa-vulkan-drivers patch && \
  apt clean && rm -rf /var/lib/apt/lists/*
 
 COPY /root/defaults/autostart_wayland /defaults/autostart_wayland
@@ -14,6 +14,7 @@ COPY /root/overall.sh /etc/cumulus-emu/file-init.sh
 RUN chmod +x /etc/cumulus-emu/file-init.sh
 
 WORKDIR /nixbuild
+
 
 
 #USER abc
@@ -55,15 +56,8 @@ nix-env -i -f ./xemu.nix && \
 nix-env -i -f ./xenia-canary.nix && \
 nix-store --gc
 
-#RUN <<EOF
-#  echo "alias eden='nixVulkanIntel eden'" >> .bashrc
-#  echo "alias dolphin-emu='nixVulkanIntel dolphin-emu'" >> .bashrc
-#  echo "alias flycast='nixVulkanIntel flycast'" >> .bashrc
-#  echo "alias pcsx2-qt='nixVulkanIntel pcsx2-qt'" >> .bashrc
-#  echo "alias rpcs3='QT_QPA_PLATFORM=xcb nixVulkanIntel rpcs3'">> .bashrc
-#  echo "alias RMG='nixVulkanIntel RMG'" >> .bashrc
-#  echo "alias xenia_canary='nixVulkanIntel xenia_canary'" >> .bashrc
-#EOF
+RUN patch /usr/share/selkies/selkies-dashboard/src/universalTouchGamepad.js /nixbuild/universalgamepad.patch
+RUN patch /usr/share/selkies/selkies-dashboard-wish/src/universalTouchGamepad.js /nixbuild/universalgamepad.patch
 
 ENV PIXELFLUX_WAYLAND=true
 
