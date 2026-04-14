@@ -11,5 +11,6 @@ rec{
   pcsx2-new = pkgs.pcsx2.overrideAttrs (finalAttrs: previousAttrs: {
       version = "99.99.99";
       src = pcsx2-src;
+      buildInputs = previousAttrs.buildInputs ++ [ pkgs.rapidyaml ];
   });
 }
