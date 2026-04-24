@@ -1,5 +1,5 @@
 FROM ghcr.io/linuxserver/baseimage-selkies:ubuntunoble
-LABEL org.opencontainers.image.source https://github.com/T2theV/Cumulus-Emulation-Project
+LABEL org.opencontainers.image.source=https://github.com/T2theV/Cumulus-Emulation-Project
 
 RUN apt update && apt install -y --no-install-recommends \
 #  build-essential clang-format git cmake gettext libharfbuzz-dev libicu-dev libsdl2-dev libavcodec-dev libavfilter-dev libavformat-dev libavutil-dev libfreeimage-dev libfreetype6-dev libgit2-dev libcurl4-openssl-dev libpugixml-dev libasound2-dev libbluetooth-dev libgl1-mesa-dev libpoppler-cpp-dev \
