@@ -1,5 +1,5 @@
 FROM ghcr.io/linuxserver/baseimage-selkies:ubuntunoble
-LABEL org.opencontainers.image.source https://github.com/T2theV/Cumulus-Emulation-Project
+LABEL org.opencontainers.image.source=https://github.com/T2theV/Cumulus-Emulation-Project
 
 RUN apt update && apt install -y --no-install-recommends \
 #  build-essential clang-format git cmake gettext libharfbuzz-dev libicu-dev libsdl2-dev libavcodec-dev libavfilter-dev libavformat-dev libavutil-dev libfreeimage-dev libfreetype6-dev libgit2-dev libcurl4-openssl-dev libpugixml-dev libasound2-dev libbluetooth-dev libgl1-mesa-dev libpoppler-cpp-dev \
@@ -39,11 +39,16 @@ COPY ./*.nix .
 COPY ./*.patch .
 COPY ./emulators-src.json .
 RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
+nix-channel --add https://nixos.org/channels/nixpkgs-unstable unstable && \
 nix-channel --update && \
 ./localbuild.sh && \
-nix-build dolphin.nix flycast.nix pcsx2.nix && \
-nix-build rmg.nix rpcs3.nix && \
-nix-build xemu.nix xenia-canary.nix && \
+nix-build dolphin.nix && \
+nix-build flycast.nix && \
+nix-build pcsx2.nix && \
+nix-build rmg.nix && \
+NIXPKGS_ALLOW_UNFREE=1 nix-build rpcs3.nix && \
+nix-build xemu.nix && \
+nix-build xenia-canary.nix && \
 nix-build eden.nix && \
 # #RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 nix-env -i -f ./eden.nix && \
@@ -51,7 +56,7 @@ nix-env -i -f ./dolphin.nix && \
 nix-env -i -f ./flycast.nix && \
 nix-env -i -f ./pcsx2.nix && \
 nix-env -i -f ./rmg.nix && \
-nix-env -i -f ./rpcs3.nix && \
+NIXPKGS_ALLOW_UNFREE=1 nix-env -i -f ./rpcs3.nix && \
 nix-env -i -f ./xemu.nix && \
 nix-env -i -f ./xenia-canary.nix && \
 nix-store --gc
