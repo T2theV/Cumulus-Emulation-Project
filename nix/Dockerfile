@@ -39,11 +39,16 @@ COPY ./*.nix .
 COPY ./*.patch .
 COPY ./emulators-src.json .
 RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
+nix-channel --add https://nixos.org/channels/nixpkgs-unstable unstable && \
 nix-channel --update && \
 ./localbuild.sh && \
-nix-build dolphin.nix flycast.nix pcsx2.nix && \
-nix-build rmg.nix rpcs3.nix && \
-nix-build xemu.nix xenia-canary.nix && \
+nix-build dolphin.nix && \
+nix-build flycast.nix && \
+nix-build pcsx2.nix && \
+nix-build rmg.nix && \
+NIXPKGS_ALLOW_UNFREE=1 nix-build rpcs3.nix && \
+nix-build xemu.nix && \
+nix-build xenia-canary.nix && \
 nix-build eden.nix && \
 # #RUN . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && \
 nix-env -i -f ./eden.nix && \
