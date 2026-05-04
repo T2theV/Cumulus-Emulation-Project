@@ -56,7 +56,7 @@ nix-env -i -f ./dolphin.nix && \
 nix-env -i -f ./flycast.nix && \
 nix-env -i -f ./pcsx2.nix && \
 nix-env -i -f ./rmg.nix && \
-nix-env -i -f ./rpcs3.nix && \
+NIXPKGS_ALLOW_UNFREE=1 nix-env -i -f ./rpcs3.nix && \
 nix-env -i -f ./xemu.nix && \
 nix-env -i -f ./xenia-canary.nix && \
 nix-store --gc
