@@ -17,5 +17,6 @@ rec{
 			    pkgs.sdl3
 			 ] ++ previousAttrs.nativeBuildInputs;
       buildInputs = [ pkgs.sdl3 ] ++ previousAttrs.buildInputs;
+      postInstall = "";
   });
 }
