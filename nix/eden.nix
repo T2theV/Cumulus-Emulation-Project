@@ -6,14 +6,17 @@ in
 rec{
   #edenatts = builtins.fromJSON ( builtins.readFile ./eden-full-out.json);
   eden-src = pkgs.eden.src.overrideAttrs(finalAttrs: previousAttrs: { 
-   hash = "sha256-MFIbhPjI4FvB0dSCgLTmMGBtSOUHbAZfQEQTGKQCBLw=";
+   hash = "sha256-YljgWKS12iOXFo8CI43dYsJtLsxyy9MjxQrNHK1Dxh0=";
 #edenatts.hash;
   });
   eden-new = pkgs.eden.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = eden-src;
       patches = [];
-      nativeBuildInputs = [ pkgs.kdePackages.qtcharts ] ++ previousAttrs.nativeBuildInputs;
-#      buildInputs = [ pkgs.qt6.full ] ++ previousAttrs.buildInputs;
+      nativeBuildInputs = [ pkgs.kdePackages.qtcharts
+			    pkgs.sdl3
+			 ] ++ previousAttrs.nativeBuildInputs;
+      buildInputs = [ pkgs.sdl3 ] ++ previousAttrs.buildInputs;
+      postInstall = "";
   });
 }
