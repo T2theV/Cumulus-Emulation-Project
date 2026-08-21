@@ -16,6 +16,7 @@ rec{
 #	pkgs.alsa-lib
         (pkgs.glew.override { enableEGL = false; })
       ] ++  previousAttrs.buildInputs;
+      patches = "";
   });
 
 }
