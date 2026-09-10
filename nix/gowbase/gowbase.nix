@@ -12,6 +12,7 @@ let
     root = ./.;
     fileset = ./entrypoint.sh;
   };
+  dol_retro = import ./dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
   name = "hello-docker";
   tag = "latest";
@@ -37,11 +38,14 @@ in pkgs.dockerTools.buildLayeredImage {
     etc
     opt
     entrypoint
+
+    dol_retro.dolphin-new
     
-#    pkgs.flycast
+#    pkgs.dolphin-emu
+#    pkgs.bash
    ];
   config = {
-    Cmd = [ "/bin/flycast" "--version" ];
+    Cmd = [ "/bin/bash" ];
     Env = [
       "PUID=1000"
       "PGID=1000"
