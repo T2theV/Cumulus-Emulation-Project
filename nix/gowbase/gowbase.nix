@@ -17,23 +17,25 @@ in pkgs.dockerTools.buildLayeredImage {
   name = "hello-docker";
   tag = "latest";
   contents = [ 
-#    pkgs.curl
-#    pkgs.ffmpeg
-#    pkgs.jq
-#    pkgs.dbus
-#    pkgs.libGLU
-#    pkgs.gtk3
-#    pkgs.sdl2-compat
-#    pkgs.vulkan-headers
-#    pkgs.p7zip
-#    pkgs.qt5.qtbase
-#    pkgs.qt6.qtbase
-#    pkgs.wget
-#    pkgs.x11docker
-#    pkgs.mesa
-#    pkgs.libusb1
-#    pkgs.xz
-#    pkgs.gosu
+    pkgs.curl
+    pkgs.ffmpeg
+    pkgs.jq
+    pkgs.dbus
+    pkgs.libGLU
+    pkgs.gtk3
+    pkgs.sdl2-compat
+    pkgs.vulkan-headers
+    pkgs.p7zip
+    pkgs.qt5.qtbase
+    pkgs.qt6.qtbase
+    pkgs.wget
+    pkgs.x11docker
+    pkgs.mesa
+    pkgs.libusb1
+    pkgs.xz
+    pkgs.gosu
+    pkgs.coreutils
+    pkgs.shadow
     
     etc
     opt
@@ -42,10 +44,12 @@ in pkgs.dockerTools.buildLayeredImage {
     dol_retro.dolphin-new
     
 #    pkgs.dolphin-emu
-#    pkgs.bash
+    pkgs.bash
+    pkgs.dockerTools.binSh
+    pkgs.dockerTools.usrBinEnv
    ];
   config = {
-    Cmd = [ "/bin/bash" ];
+    Cmd = [ "/bin/sh" "/entrypoint.sh" ];
     Env = [
       "PUID=1000"
       "PGID=1000"
