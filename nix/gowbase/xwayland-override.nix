@@ -1,8 +1,8 @@
 final: prev:
 {
-  xorg-server = prev.xorg-server.overrideAttrs (old: {
-      src = prev.xorg-server.src.overrideAttrs(old: {
-        postfetch = ''
+  cumulus-xwayland = prev.xwayland.overrideAttrs (old: {
+    #  src = prev.xwayland.src.overrideAttrs(old: {
+        postFetch = ''
             TARGET=hw/xwayland/xwayland-output.c
             ls -la "$TARGET"
             BEFORE=$(grep -c 'ARRAY_SIZE(xwl_output_fake_modes)' "$TARGET" || true)
@@ -14,6 +14,7 @@ final: prev:
             test "$AFTER" -eq 0 || { echo "sed transformation incomplete (still $AFTER matches)"; exit 1; }
             echo "Neutralized $BEFORE fake-mode iteration site(s)"
         '';
-      });
+       # version = prev.xwayland.version + "-cumulus";
+   #   });
   });
 }

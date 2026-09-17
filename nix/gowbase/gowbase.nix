@@ -36,12 +36,13 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.gosu
     pkgs.coreutils
     pkgs.shadow
+    pkgs.cumulus-xwayland
     
     etc
     opt
     entrypoint
 
-    dol_retro.dolphin-new
+    #dol_retro.dolphin-new
     
 #    pkgs.dolphin-emu
     pkgs.bash
