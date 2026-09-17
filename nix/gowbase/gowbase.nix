@@ -1,5 +1,5 @@
 let
-  pkgs = import <nixpkgs> {};
+  pkgs = import <nixpkgs> {overlays = [ (import ./xwayland-override.nix) ];};
   etc = pkgs.lib.fileset.toSource {
     root = ./.;
     fileset = ./etc;
