@@ -12,6 +12,15 @@ let
     root = ./.;
     fileset = ./entrypoint.sh;
   };
+  scripts_dir= pkgs.lib.fileset.toSource {
+    root = ./.;
+    fileset = ./scripts;
+  }; 
+  cfg_dir = pkgs.lib.fileset.toSource {
+    root = ./.;
+    fileset = ./cfg;
+  };
+
   dol_retro = import ./dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
   name = "hello-docker";
@@ -41,6 +50,8 @@ in pkgs.dockerTools.buildLayeredImage {
     etc
     opt
     entrypoint
+    scripts_dir
+    cfg_dir
 
     #dol_retro.dolphin-new
     
