@@ -11,5 +11,6 @@ rec{
   dolphin-new = pkgs.dolphin-emu.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = dolphin-src;
+      qtWrapperArgs = "";
   });
 }

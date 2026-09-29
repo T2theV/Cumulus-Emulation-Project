@@ -1,6 +1,12 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -e
+source /opt/gow/bash-lib/utils.sh
 
-echo "ERROR: This script '$0' must be replaced with the service init commands. Exit!"
-exit 1
+# Launch the container's startup script
+if [ -f "$DISPLAY" ]; then
+    gow_log "Waiting for X Server $DISPLAY to be available"
+    /opt/gow/wait-x11
+fi
+
+exec /opt/gow/startup-app.sh

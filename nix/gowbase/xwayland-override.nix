@@ -1,6 +1,6 @@
 final: prev:
 {
-  cumulus-xwayland = prev.xwayland.overrideAttrs (old: {
+  xwayland = prev.xwayland.overrideAttrs (old: {
     #  src = prev.xwayland.src.overrideAttrs(old: {
         postFetch = ''
             TARGET=hw/xwayland/xwayland-output.c
