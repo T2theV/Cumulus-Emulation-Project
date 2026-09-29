@@ -1,5 +1,5 @@
 let
-  pkgs = import <nixpkgs> {system = "x86_64-linux"; overlays = [ (import ./xwayland-override.nix) ];};
+  pkgs = import <nixpkgs> {system = "x86_64-linux"; overlays = [  ];};
   etc = pkgs.lib.fileset.toSource {
     root = ./.;
     fileset = ./etc;
@@ -52,6 +52,7 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.shadow
     pkgs.glibc
     pkgs.xwayland
+    pkgs.egl-gbm
     pkgs.foot
     pkgs.libxcb-cursor
     pkgs.qt6.qtwayland    
@@ -59,17 +60,17 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.strace
     pkgs.xcb-util-cursor
     pkgs.gamescope
-
-    pkgs.xorg.libxcb
-    pkgs.xorg.xcbutilwm
-    pkgs.xorg.xcbutilimage
-    pkgs.xorg.xcbutilkeysyms
-    pkgs.xorg.xcbutilrenderutil
+    pkgs.waybar
+    pkgs.sway
+    pkgs.mangohud
+    pkgs.xdpyinfo
+    pkgs.xkbcomp
+    pkgs.xdg-desktop-portal
 
     etc
     opt
     entrypoint
-    scripts_dir
+    #scripts_dir
     cfg_dir
 
 #    dol_retro.dolphin-new
