@@ -12,16 +12,16 @@ let
     root = ./.;
     fileset = ./entrypoint.sh;
   };
-  scripts_dir= pkgs.lib.fileset.toSource {
+  share_dir= pkgs.lib.fileset.toSource {
     root = ./.;
-    fileset = ./scripts;
+    fileset = ./share;
   }; 
   cfg_dir = pkgs.lib.fileset.toSource {
     root = ./.;
     fileset = ./cfg;
   };
 
-  dol_retro = import ./dolphin.nix;
+#  dol_retro = import ./dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
   name = "hello-docker";
   tag = "latest";
@@ -34,6 +34,8 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.gtk3
     pkgs.sdl2-compat
     pkgs.vulkan-headers
+    pkgs.vulkan-loader
+    pkgs.libdrm
     pkgs.p7zip
     pkgs.qt5.qtbase
     pkgs.qt6.qtbase
@@ -66,11 +68,16 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.xdpyinfo
     pkgs.xkbcomp
     pkgs.xdg-desktop-portal
+    pkgs.xdg-desktop-portal-gtk
+    pkgs.mako
+    pkgs.busybox
+    pkgs.pipewire
+    pkgs.systemd
 
     etc
     opt
     entrypoint
-    #scripts_dir
+    share_dir
     cfg_dir
 
 #    dol_retro.dolphin-new
