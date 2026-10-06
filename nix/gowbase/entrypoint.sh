@@ -22,7 +22,7 @@ if [ -n "${@:-}" ]; then
     /bin/bash -c "$@"
     exit $?
 fi
-
+source /opt/gow/fix-gpu-renderer.sh
 # Launch startup script as 'UNAME' user (some services will run as root)
 gow_log "Launching the container's startup script as user '${UNAME}'"
 chmod +x /opt/gow/startup.sh

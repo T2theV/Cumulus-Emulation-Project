@@ -99,7 +99,6 @@ in pkgs.dockerTools.buildLayeredImage {
       "NEEDRESTART_SUSPEND=1"
       "LANG=en_US.UTF-8"
       "QT_QPA_PLATFORM=wayland-egl"
-      "XDG_RUNTIME_DIR=/run/user/wolf"
     ];
   };
   
