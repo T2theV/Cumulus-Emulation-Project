@@ -102,6 +102,5 @@ in pkgs.dockerTools.buildLayeredImage {
       "XDG_RUNTIME_DIR=/run/user/wolf"
     ];
   };
-  post-install-
   
 }
