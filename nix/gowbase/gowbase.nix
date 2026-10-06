@@ -26,6 +26,14 @@ in pkgs.dockerTools.buildLayeredImage {
   name = "hello-docker";
   tag = "latest";
   contents = [ 
+    pkgs.mesa
+    pkgs.mesa.opencl
+    pkgs.mesa.cross_tools
+    pkgs.mesa.spirv2dxil
+    pkgs.egl-gbm
+    pkgs.vulkan-headers
+    pkgs.vulkan-loader
+    pkgs.coreutils
     pkgs.curl
     pkgs.ffmpeg
     pkgs.jq
@@ -33,18 +41,12 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.libGLU
     pkgs.gtk3
     pkgs.sdl2-compat
-    pkgs.vulkan-headers
-    pkgs.vulkan-loader
     pkgs.libdrm
     pkgs.p7zip
     pkgs.qt5.qtbase
     pkgs.qt6.qtbase
     pkgs.wget
     pkgs.x11docker
-    pkgs.mesa
-    pkgs.mesa.opencl
-    pkgs.mesa.cross_tools
-    pkgs.mesa.spirv2dxil
     pkgs.clinfo
     pkgs.vulkan-tools
     pkgs.libusb1
@@ -54,7 +56,6 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.shadow
     pkgs.glibc
     pkgs.xwayland
-    pkgs.egl-gbm
     pkgs.foot
     pkgs.libxcb-cursor
     pkgs.qt6.qtwayland    
@@ -70,8 +71,6 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.xdg-desktop-portal
     pkgs.xdg-desktop-portal-gtk
     pkgs.mako
-    pkgs.busybox
-    pkgs.pipewire
     pkgs.systemd
 
     etc
@@ -100,8 +99,9 @@ in pkgs.dockerTools.buildLayeredImage {
       "NEEDRESTART_SUSPEND=1"
       "LANG=en_US.UTF-8"
       "QT_QPA_PLATFORM=wayland-egl"
-      "QT_DEBUG_PLUGINS=1"
+      "XDG_RUNTIME_DIR=/run/user/wolf"
     ];
   };
+  post-install-
   
 }
