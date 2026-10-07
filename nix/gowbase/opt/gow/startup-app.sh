@@ -4,7 +4,7 @@ set -e
 source /opt/gow/bash-lib/utils.sh
 source /opt/gow/launch-comp.sh
 
-#dolphin-emu
+launcher dolphin-emu
 #launcher foot
-foot
+#foot
 
