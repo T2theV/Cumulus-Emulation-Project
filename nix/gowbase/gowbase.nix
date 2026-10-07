@@ -52,6 +52,8 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.libusb1
     pkgs.xz
     pkgs.gosu
+    pkgs.gnused
+    pkgs.getent
     pkgs.coreutils
     pkgs.shadow
     pkgs.glibc
