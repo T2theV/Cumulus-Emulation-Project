@@ -1,5 +1,6 @@
 let
-  pkgs = import <nixpkgs> {system = "x86_64-linux"; overlays = [  ];};
+  pkgs = import <nixos-unstable> {system = "x86_64-linux"; overlays = [  ];};
+#  pkgs2= import <nixos-unstable> {system = "x86_64-linux"; overlays = [  ];};
   etc = pkgs.lib.fileset.toSource {
     root = ./.;
     fileset = ./etc;
@@ -74,6 +75,7 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.xdg-desktop-portal-gtk
     pkgs.mako
     pkgs.systemd
+    pkgs.fontconfig
 
     etc
     opt
@@ -85,6 +87,10 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.mesa-demos
     pkgs.dolphin-emu
     pkgs.flycast
+    pkgs.rpcs3
+    pkgs.xemu
+    pkgs.rmg
+
     pkgs.bash
     pkgs.dockerTools.binSh
     pkgs.dockerTools.usrBinEnv
