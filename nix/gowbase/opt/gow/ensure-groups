@@ -11,30 +11,27 @@ for dev in "$@"; do
         dev_group=$(stat -c "%G" "$dev")
         dev_gid=$(stat -c "%g" "$dev")
 
-        # If the group name resolves to a different GID in /etc/group
-        # than the device's actual GID, treat it as unknown. Otherwise
-        # usermod adds the user to the image's group at the wrong GID
-        # and they still can't open the device — e.g. /dev/dri/renderD128
-        # is group "render" on the host but "render" inside the image may
-        # have been assigned a different numeric GID by the distro.
         existing_gid=""
         if [ "$dev_group" != "UNKNOWN" ]; then
             existing_gid=$(getent group "$dev_group" | cut -d: -f3)
         fi
         if [ "$dev_group" = "UNKNOWN" ] || [ "$existing_gid" != "$dev_gid" ]; then
             new_name="gow-gid-$dev_gid"
-            # Create a named group for the actual numeric GID so usermod
-            # adds the user to the correct group.
+            
+            # REPLACEMENT FOR groupadd: Create named group manually via echo/tee
             if ! getent group "$new_name" > /dev/null; then
-                groupadd -g "$dev_gid" "$new_name"
+                # Clean up any conflicting GID or name if they somehow exist
+                sed -i "/^[^:]*:[^:]*:${dev_gid}:/d" /etc/group
+                sed -i "/^${new_name}:/d" /etc/group
+                
+                # Append the new group line -> group_name:password:GID:user_list
+                echo "${new_name}:x:${dev_gid}:" | tee -a /etc/group > /dev/null
             fi
             group_map[$new_name]=1
         else
-            # Name matches GID in /etc/group — safe to use directly.
             group_map[$dev_group]=1
         fi
 
-        # is this device read/writable by the group? if not, make it so
         if [ "$(stat -c "%a" "$dev" | cut -c2)" -lt 6 ]; then
             chmod g+rw "$dev"
         fi
@@ -43,10 +40,37 @@ for dev in "$@"; do
     fi
 done
 
-groups=$(join_by "," "${!group_map[@]}")
-if [ "$groups" != "" ]; then
-    gow_log "Adding user '${UNAME}' to groups: $groups"
-    usermod -G "$groups" "${UNAME}"
+# REPLACEMENT FOR usermod -G
+# Modifying /etc/group manually to append the user to the targeted secondary groups
+if [ ${#group_map[@]} -gt 0 ]; then
+    gow_log "Adding user '${UNAME}' to groups: $(join_by "," "${!group_map[@]}")"
+    
+    for gname in "${!group_map[@]}"; do
+        # 1. Fetch the existing group entry line
+        group_line=$(getent group "$gname" || true)
+        
+        if [ -n "$group_line" ]; then
+            # 2. Extract current components (name, pass, GID, existing users)
+            g_name=$(echo "$group_line" | cut -d: -f1)
+            g_pass=$(echo "$group_line" | cut -d: -f2)
+            g_gid=$(echo "$group_line" | cut -d: -f3)
+            g_users=$(echo "$group_line" | cut -d: -f4)
+
+            # 3. Check if the user is already in this specific line
+            if [[ ",${g_users}," != *",${UNAME},"* ]]; then
+                if [ -z "$g_users" ]; then
+                    new_users="${UNAME}"
+                else
+                    new_users="${g_users},${UNAME}"
+                fi
+                
+                # 4. Use sed to replace the old line with the updated user list
+                old_escaped=$(printf '%s\n' "$group_line" | sed 's/[[\.*^$]/\\&/g')
+                new_line="${g_name}:${g_pass}:${g_gid}:${new_users}"
+                sed -i "s|^${old_escaped}$|${new_line}|" /etc/group
+            fi
+        fi
+    done
 else
-    gow_log "Not modifying user groups ($groups)"
+    gow_log "Not modifying user groups."
 fi
