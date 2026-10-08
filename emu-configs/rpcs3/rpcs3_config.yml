@@ -1,0 +1,51 @@
+# RPCS3 Configuration - Vulkan 1080p with SDL controller
+# Note: RPCS3 uses YAML format for configuration
+
+---
+# Video Settings
+Renderer: vulkan
+ShaderMode: async_recompiler
+Resolution: 1080p
+ResolutionScaling: 1.0
+InternalResolution: 1920x1080
+Aspect: force
+MSAA: auto
+AnisotropicFiltering: 16x
+TextureFiltering: linear
+OutputScalingMode: bilinear
+FrameLimit: 60
+VSync: true
+AsyncShaders: true
+ShaderPrecompilation: true
+GPU: auto
+ForceGPU: false
+TextureCache: enabled
+TextureCacheCompression: 8
+
+# Audio Settings
+AudioRenderer: openal
+AudioLatency: 1024
+AudioVolume: 100
+
+# Input Settings
+Controller: true
+ControllerType: SDL
+Controller1: true
+Controller2: false
+Controller3: false
+Controller4: false
+AutoGamepad: true
+
+# CPU Settings
+PPU Decoder: hybrid
+SPU Decoder: llvm
+PPU Threads: 2
+SPU Threads: 4
+Block Size: mega
+Cache Line Size: 64
+
+# System Settings
+Debugger: false
+DebuggerNative: false
+Logging: false
+VerboseLogging: false
