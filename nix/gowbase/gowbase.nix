@@ -1,5 +1,5 @@
 let
-  pkgs = import <nixos-unstable> {system = "x86_64-linux"; overlays = [  ];};
+  pkgs = import <nixpkgs> {system = "x86_64-linux"; overlays = [ (import ./xenia-canary-overlay.nix) ];};
 #  pkgs2= import <nixos-unstable> {system = "x86_64-linux"; overlays = [  ];};
   etc = pkgs.lib.fileset.toSource {
     root = ./.;
@@ -76,6 +76,7 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.mako
     pkgs.systemd
     pkgs.fontconfig
+    pkgs.glibcLocales
 
     etc
     opt
@@ -84,13 +85,13 @@ in pkgs.dockerTools.buildLayeredImage {
     cfg_dir
 
 #    dol_retro.dolphin-new
-    pkgs.mesa-demos
     pkgs.dolphin-emu
     pkgs.flycast
     pkgs.rpcs3
     pkgs.xemu
     pkgs.rmg
-
+    pkgs.xenia-canary
+    pkgs.eden
     pkgs.bash
     pkgs.dockerTools.binSh
     pkgs.dockerTools.usrBinEnv

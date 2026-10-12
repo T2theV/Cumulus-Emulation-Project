@@ -11,3 +11,6 @@ ln -sfnf "$MESA" /run/opengl-driver
 mkdir -p /tmp
 chmod 1777 /tmp
 mkdir -p /dev/input
+ln -s /nix/store/ig5ylfz7qcgpmvzip4pxfkp2pfi76s2j-glibc-locales-2.44-25/lib /usr
+export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
+
