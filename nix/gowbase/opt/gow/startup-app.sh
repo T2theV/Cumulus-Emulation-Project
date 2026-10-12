@@ -5,7 +5,7 @@ source /opt/gow/bash-lib/utils.sh
 source /opt/gow/launch-comp.sh
 
 #launcher rpcs3 -platform xcb
-launcher dolphin-emu
+launcher xenia_canary
 #launcher foot
 #foot
 
