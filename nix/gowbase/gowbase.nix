@@ -92,6 +92,10 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.rmg
     pkgs.xenia-canary
     pkgs.eden
+    pkgs.pcsx2
+
+    pkgs.pegasus-frontend
+
     pkgs.bash
     pkgs.dockerTools.binSh
     pkgs.dockerTools.usrBinEnv
