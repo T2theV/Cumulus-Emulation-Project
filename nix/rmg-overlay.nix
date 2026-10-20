@@ -7,11 +7,13 @@ final: prev:
             rev=( builtins.fromJSON( builtins.readFile ./rmg-out.json)).rev;
             hash="";
         });
-	buildInputs = [ old.buildInputs] ++ [ 
-		prev.sdl3-net
+	buildInputs = old.buildInputs ++ [ 
+		prev.sdl3
+        prev.sdl3-net
 		prev.qt6.qtbase 
 	];
-	nativeBuildInputs = [ old.nativeBuildInputs ] ++ [
+	nativeBuildInputs = old.nativeBuildInputs ++ [
+		prev.sdl3
 		prev.sdl3-net
 	];
     });
