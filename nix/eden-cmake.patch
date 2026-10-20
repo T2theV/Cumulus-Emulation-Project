@@ -1,13 +1,16 @@
 diff --git a/externals/CMakeLists.txt b/externals/CMakeLists.txt
-index cb1deceb96..c1494dec21 100644
+index cb1deceb96..a211b7f013 100644
 --- a/externals/CMakeLists.txt
 +++ b/externals/CMakeLists.txt
-@@ -48,7 +48,7 @@ if (NOT TARGET stb::headers)
+@@ -48,11 +48,6 @@ if (NOT TARGET stb::headers)
      add_library(stb::headers ALIAS stb)
  endif()
  
 -AddJsonPackage(NAME zbic DOWNLOAD_ONLY)
-+AddJsonPackage(NAME zbic)
- set(ZBIC_INCLUDE_DIR
-     "${zbic_SOURCE_DIR}/src"
-     PARENT_SCOPE)
+-set(ZBIC_INCLUDE_DIR
+-    "${zbic_SOURCE_DIR}/src"
+-    PARENT_SCOPE)
+-
+ # ItaniumDemangle (Windows only)
+ if (WIN32 AND NOT TARGET LLVM::Demangle)
+     add_library(demangle demangle/ItaniumDemangle.cpp)

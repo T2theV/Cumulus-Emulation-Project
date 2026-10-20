@@ -15,7 +15,7 @@ final: prev:
       hash = "sha256-w+GrA3jnO8vdom+t2KgIQXMT/iJOZNFLYXtM3kXt7CI=";
     });
     cmakeFlags = [
-      "-DZbic_CUSTOM_DIR=${final.zbicSrc}"
+      "-DZBIC_INCLUDE_DIR=${final.zbicSrc}/src"
     ] ++ old.cmakeFlags;
     buildInputs = old.buildInputs ++ [
       final.zbicSrc
