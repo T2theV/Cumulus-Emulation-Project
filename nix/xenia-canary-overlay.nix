@@ -5,6 +5,7 @@ final: prev: {
             rev=( builtins.fromJSON( builtins.readFile ./xenia-canary-out.json)).rev;
             owner = "has207";
             repo = "xenia-edge";
+            hash = "";
         });
         buildInputs = [prev.alsa-lib] ++ old.buildInputs;
     });

@@ -1,6 +1,21 @@
 let
-  pkgs = import <nixpkgs> {system = "x86_64-linux"; overlays = [ (import ./xenia-canary-overlay.nix) ];};
-#  pkgs2= import <nixos-unstable> {system = "x86_64-linux"; overlays = [  ];};
+  nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
+  pkgs = import nixpkgs { overlays = [ 
+#	(import ./eden-overlay.nix)
+#	(import ./eden-overlay-hash.nix)
+	(import ./dolphin-emu-overlay.nix)
+	(import ./dolphin-emu-overlay-hash.nix)
+	(import ./flycast-overlay.nix)
+	(import ./flycast-overlay-hash.nix)
+	(import ./pcsx2-overlay.nix)
+	(import ./pcsx2-overlay-hash.nix)
+#	(import ./rmg-overlay.nix)
+#	(import ./rmg-overlay-hash.nix)
+	(import ./rpcs3-overlay.nix)
+	(import ./rpcs3-overlay-hash.nix)
+	(import ./xenia-canary-overlay.nix)
+	(import ./xenia-canary-overlay-hash.nix)
+ ];};
   etc = pkgs.lib.fileset.toSource {
     root = ./.;
     fileset = ./etc;

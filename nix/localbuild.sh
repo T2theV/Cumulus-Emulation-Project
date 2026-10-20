@@ -1,5 +1,3 @@
-#! /bin/bash
-
 RANGE=$(jq -r '. | length' emulators-src.json)
 for ((index = 0; index < $RANGE; index++));
 do

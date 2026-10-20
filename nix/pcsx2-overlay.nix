@@ -5,6 +5,7 @@ final: prev:
         src = prev.pcsx2.src.overrideAttrs( old: {
             tag = 0;
             rev =  (builtins.fromJSON(builtins.readFile ./pcsx2-out.json)).rev;
+            hash="";
         });
     });
 }

@@ -11,12 +11,6 @@ rec{
   rpcs3-new = pkgs.rpcs3.overrideAttrs (finalAttrs: previousAttrs: {
       version = "master";
       src = rpcs3-src;
-      buildInputs = [ 
-#	pkgs.jack2
-#	pkgs.alsa-lib
-        (pkgs.glew.override { enableEGL = false; })
-      ] ++  previousAttrs.buildInputs;
-      patches = "";
   });
 
 }
