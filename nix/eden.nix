@@ -9,13 +9,7 @@ rec{
    #hash = edenatts.hash;
   #});
   eden-new = pkgs.eden.overrideAttrs (finalAttrs: previousAttrs: {
-      version = "master";
+#      version = "master";
 #      src = eden-src;
-      nativeBuildInputs = [ pkgs.kdePackages.qtcharts
-			    pkgs.sdl3
-			 ] ++ previousAttrs.nativeBuildInputs;
-      buildInputs = [ pkgs.sdl3 ] ++ previousAttrs.buildInputs;
-      postInstall = "";
-      postConfigure = "";
   });
 }

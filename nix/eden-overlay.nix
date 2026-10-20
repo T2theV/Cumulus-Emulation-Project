@@ -1,21 +1,30 @@
 final: prev:
 {
+  zbicSrc = prev.fetchFromGitHub {
+      owner = "kinnay";
+      repo = "zbic";
+      rev = "11b08f2712264bbed731545085cbd9702096ceb7";
+      sha256 = "sha256-pHvxa1gkUvQo6mUgmLWtj1kcu01BLdGmttZyb8ZAj/o=";
+  };
   eden = prev.eden.overrideAttrs (old: {
-#      src = prev.fetchFromGitHub {
-#        owner = "eden-emulator";
-#       repo = "mirror";
-       src = prev.eden.src.overrideAttrs(old: {
-	tag = 0;
-#	 rev=( builtins.fromJSON( builtins.readFile ./eden-out.json)).rev;
-	 rev= "37fe9119526c03ca064166130cc983c55b9a9e86";
-         hash = "sha256-E5mIKtq4HkGFstx3laVAprYCsV8bpw4rq6cyeD0fMRw=";
-        });
-     buildInputs = old.buildInputs ++ [
-	prev.sdl3
-	prev.cpm-cmake];
-     nativeBuildInputs = old.nativeBuildInputs ++ [ prev.sdl3];
-     buildPhase = ''
-	cpm init eden
-	cpm run
+    
+    src = prev.eden.src.overrideAttrs(old: {
+	    tag = 0;
+	    rev = (builtins.fromJSON( builtins.readFile ./eden-out.json)).rev;
+#	    rev = "37fe9119526c03ca064166130cc983c55b9a9e86";
+      hash = "sha256-w+GrA3jnO8vdom+t2KgIQXMT/iJOZNFLYXtM3kXt7CI=";
+    });
+    cmakeFlags = old.cmakeFlags ++ [
+      (prev.lib.cmakeBool "CPM_USE_LOCAL_PACKAGES" true)
+      (prev.lib.cmakeFeature "CPM_PACKAGE_zbic_SOURCE" "${final.zbicSrc}")
+    ];
+    buildInputs = old.buildInputs ++ [
+      final.zbicSrc
+      prev.sdl3
+      prev.cpm-cmake
+    ];
+    nativeBuildInputs = old.nativeBuildInputs ++ [ 
+        prev.sdl3
+    ];
   });
 }
