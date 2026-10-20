@@ -14,17 +14,18 @@ final: prev:
 #	    rev = "37fe9119526c03ca064166130cc983c55b9a9e86";
       hash = "sha256-w+GrA3jnO8vdom+t2KgIQXMT/iJOZNFLYXtM3kXt7CI=";
     });
-    cmakeFlags = old.cmakeFlags ++ [
-      (prev.lib.cmakeBool "CPM_USE_LOCAL_PACKAGES" true)
-      (prev.lib.cmakeFeature "CPM_PACKAGE_zbic_SOURCE" "${final.zbicSrc}")
-    ];
+    cmakeFlags = [
+      "-DZbic_CUSTOM_DIR=${final.zbicSrc}"
+    ] ++ old.cmakeFlags;
     buildInputs = old.buildInputs ++ [
       final.zbicSrc
       prev.sdl3
       prev.cpm-cmake
     ];
     nativeBuildInputs = old.nativeBuildInputs ++ [ 
+        final.zbicSrc
         prev.sdl3
     ];
+    patches = [./eden-cmake.patch];
   });
 }
