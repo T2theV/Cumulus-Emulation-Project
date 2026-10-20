@@ -1,8 +1,8 @@
 let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
   pkgs = import nixpkgs { overlays = [ 
-#	(import ./eden-overlay.nix)
-#	(import ./eden-overlay-hash.nix)
+	(import ./eden-overlay.nix)
+	(import ./eden-overlay-hash.nix)
 	(import ./dolphin-emu-overlay.nix)
 	(import ./dolphin-emu-overlay-hash.nix)
 	(import ./flycast-overlay.nix)

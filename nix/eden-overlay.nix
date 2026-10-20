@@ -16,6 +16,7 @@ final: prev:
     });
     cmakeFlags = [
       "-DZBIC_INCLUDE_DIR=${final.zbicSrc}/src"
+      "-DENABLE_RESHADE=OFF"
     ] ++ old.cmakeFlags;
     buildInputs = old.buildInputs ++ [
       final.zbicSrc
@@ -27,5 +28,7 @@ final: prev:
         prev.sdl3
     ];
     patches = [./eden-cmake.patch];
+    postConfigure="";
+    postInstall="";
   });
 }
