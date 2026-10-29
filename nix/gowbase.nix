@@ -1,20 +1,7 @@
 let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
-  pkgs = import nixpkgs { overlays = [ 
-	(import ./eden-overlay.nix)
-	(import ./eden-overlay-hash.nix)
-	(import ./dolphin-emu-overlay.nix)
-	(import ./dolphin-emu-overlay-hash.nix)
-	(import ./flycast-overlay.nix)
-	(import ./flycast-overlay-hash.nix)
-	(import ./pcsx2-overlay.nix)
-	(import ./pcsx2-overlay-hash.nix)
-	(import ./rmg-overlay.nix)
-	(import ./rmg-overlay-hash.nix)
-	(import ./rpcs3-overlay.nix)
-	(import ./rpcs3-overlay-hash.nix)
-	(import ./xenia-canary-overlay.nix)
-	(import ./xenia-canary-overlay-hash.nix)
+  pkgs = import nixpkgs { overlays = [
+	(import ./xenia-edge-overlay.nix)
  ];};
   etc = pkgs.lib.fileset.toSource {
     root = ./.;
@@ -99,15 +86,9 @@ in pkgs.dockerTools.buildLayeredImage {
     share_dir
     cfg_dir
 
-#    dol_retro.dolphin-new
-    pkgs.dolphin-emu
-    pkgs.flycast
-    pkgs.rpcs3
-    pkgs.xemu
-    pkgs.rmg
-    pkgs.xenia-canary
-    pkgs.eden
-    pkgs.pcsx2
+    # The emulator for this image: has207/xenia-edge fork (branch edge).
+    # Package: ./xenia-edge.nix (overlay: ./xenia-edge-overlay.nix).
+    pkgs.xenia-edge
 
     pkgs.pegasus-frontend
 

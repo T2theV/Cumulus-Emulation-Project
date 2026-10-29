@@ -1,0 +1,6 @@
+# Placeholder waybar (v1) config for the GOW webtop.
+# /opt/gow/launch-comp.sh copies this to ~/.config/waybar/ on the RUN_SWAY
+# path. Replace with your real waybar config.
+modules-left = [ "workspaces" ]
+modules-center = [ "window" ]
+modules-right = [ "time" ]
