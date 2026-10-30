@@ -1,0 +1,6 @@
+# GOW webtop sway base config — consumed by the RUN_SWAY launcher path in
+# /opt/gow/launch-comp.sh, which appends the runtime output resolution and
+# the app to exec before starting sway.
+input * {
+    pointer_speed 0
+}

@@ -1,16 +1,12 @@
-{ pkgs ? import <nixpkgs> { }
-, pkgsLinux ? import <nixpkgs> { system = "x86_64-linux"; }
+{ pkgs ? import <nixpkgs> { system = "x86_64-linux"; }
 }:
 
-pkgs.dockerTools.buildImage {
+pkgs.dockerTools.buildLayeredImage {
   name = "hello-docker";
+  tag = "latest";
+  contents = [ pkgs.hello ];
   config = {
     Cmd = [ "/bin/hello" ];
   };
   
-  copyToRoot = pkgs.buildEnv {
-    name = "image-root";
-    paths = [ pkgsLinux.hello ];
-    pathsToLink = [ "/bin" ];
-  };
 }

@@ -2,3 +2,4 @@
 !docs/**
 **.hash
 !**-src.json
+nix/gowbase/gow-master

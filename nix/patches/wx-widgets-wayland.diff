@@ -1,0 +1,13 @@
+diff --git a/include/wx/gtk/private/wayland.h b/include/wx/gtk/private/wayland.h
+index 20ad69a4dc..13f69a48b5 100644
+--- a/include/wx/gtk/private/wayland.h
++++ b/include/wx/gtk/private/wayland.h
+@@ -17,7 +17,7 @@
+ // Use Wayland protocols directly if we have wayland-client and a new enough
+ // GTK version to compile the code using it.
+ #if defined(GDK_WINDOWING_WAYLAND) && GTK_CHECK_VERSION(3,20,0)
+-    #ifdef wxHAVE_WAYLAND_CLIENT
++    #if wxHAVE_WAYLAND_CLIENT
+         #define wxHAVE_WAYLAND_PROTOCOLS
+     #endif
+ #endif

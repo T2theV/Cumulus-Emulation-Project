@@ -37,9 +37,9 @@
         "repo": "xenia-canary"
     },
     {
-        "name": "Eden",
-        "nixpkg": "eden",
-        "owner" : "eden-emulator",
-        "repo" : "mirror"
+	"name": "Eden",
+	"nixpkg": "eden",
+	"owner": "eden-emulator",
+	"repo": "mirror"
     }
 ]
