@@ -28,14 +28,14 @@ let
     root = ./.;
     fileset = ./entrypoint.sh;
   };
-  share_dir= pkgs.lib.fileset.toSource {
-    root = ./.;
-    fileset = ./share;
-  }; 
-  cfg_dir = pkgs.lib.fileset.toSource {
-    root = ./.;
-    fileset = ./cfg;
-  };
+#  share_dir= pkgs.lib.fileset.toSource {
+#    root = ./.;
+#    fileset = ./share;
+#  }; 
+#  cfg_dir = pkgs.lib.fileset.toSource {
+#    root = ./.;
+#    fileset = ./cfg;
+#  };
 
 #  dol_retro = import ./dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
@@ -96,8 +96,8 @@ in pkgs.dockerTools.buildLayeredImage {
     etc
     opt
     entrypoint
-    share_dir
-    cfg_dir
+#    share_dir
+#    cfg_dir
 
 #    dol_retro.dolphin-new
     pkgs.dolphin-emu
