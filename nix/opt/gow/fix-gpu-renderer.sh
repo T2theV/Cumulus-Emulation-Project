@@ -1,5 +1,5 @@
 #!/bin/bash
-MESA=/nix/store/z5zn9mxnvik2s9h1bpnr1ipa27qhi9py-mesa-26.2.5
+MESA=/nix/store/jg8f97fhfmkpccrm3lsxlavkivpjbs72-mesa-26.2.5
 mkdir -p /home/retro/.config/vulkan/icd.d /etc/glvnd/egl_vendor.d
 ln -sf "$MESA/share/vulkan/icd.d/radeon_icd.x86_64.json" \
        /home/retro/.config/vulkan/icd.d/radeon_icd.x86_64.json

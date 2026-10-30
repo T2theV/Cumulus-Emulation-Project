@@ -10,10 +10,10 @@
 # Pinned to the refs the script would track today (branch heads), not the
 # mutable branch refs: fetchFromGitHub pins by commit; the single-file
 # fetchurls point at raw.githubusercontent.com/<owner>/<repo>/<commit>/<path>,
-# which is immutable. compatibility_data.json comes from a release tag,
-# which is also immutable.
+# which is immutable. compatibility_data.json comes from the rolling
+# release tag — mutable, see item 4.
 let p = import <nixpkgs> {};
-    xenia-src = import ./src.nix;  # pinned xenia-edge FOD (master.json)
+    xenia-src = (import ./src.nix).src;  # grafted xenia-edge src (master.json)
 in rec {
   # 1. Community game patches — CMake reads <this>/patches at build time
   #    (src/xenia/patcher/CMakeLists.txt).
@@ -37,10 +37,13 @@ in rec {
     sha256 = "DxeDG2qeDp/C9Sv4qxvvHTD/0wfZZsIRjlVts0XqfpY=";
   };
 
-  # 4. Game compatibility data — release asset, immutable tag.
+  # 4. Game compatibility data — release asset. The tag is MUTABLE: the
+  #    repo's CI re-publishes the asset (the data lives in the repo's issues;
+  #    the repo itself has no data file), so re-pin the hash when upstream
+  #    updates — the build error prints the new hash.
   compatibility-data = p.fetchurl {
     url = "https://github.com/xenia-canary/game-compatibility/releases/download/game-compatibility/compatibility_data.json";
-    sha256 = "uW2BtDRImwFBcWk58q/5/CNLYYpc1BPVPD5JuZgEw1M=";
+    sha256 = "fe3e435e40f94eb7093e71c873a7725dcfb5d5147500a652f058f0db705a95c7";
   };
 
   # Combined tree mirroring build/data_repos/, plus the vendored

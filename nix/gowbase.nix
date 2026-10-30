@@ -23,6 +23,17 @@ let
     root = ./.;
     fileset = ./cfg;
   };
+  # Mesa's Vulkan ICD manifests live in $mesa/share/vulkan/icd.d, which
+  # the Vulkan loader never searches: this loader generation searches XDG
+  # locations ($HOME/.config/vulkan/icd.d first, then the XDG_CONFIG_DIRS
+  # entries, /run/opengl-driver/share, and /usr/share); older loaders
+  # search /etc/vulkan/icd.d. dockerTools merges this derivation's etc/
+  # into the image's /etc, and cont-init script 20-vulkan-icd.sh
+  # symlinks it into $HOME/.config/vulkan/.
+  vulkan-icd-etc = pkgs.runCommand "vulkan-icd-etc" {} ''
+    mkdir -p $out/etc/vulkan/icd.d
+    cp ${pkgs.mesa}/share/vulkan/icd.d/*.json $out/etc/vulkan/icd.d/
+  '';
 
 #  dol_retro = import ./dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
@@ -85,6 +96,7 @@ in pkgs.dockerTools.buildLayeredImage {
     entrypoint
     share_dir
     cfg_dir
+    vulkan-icd-etc
 
     # The emulator for this image: has207/xenia-edge fork (branch edge).
     # Package: ./xenia-edge.nix (overlay: ./xenia-edge-overlay.nix).

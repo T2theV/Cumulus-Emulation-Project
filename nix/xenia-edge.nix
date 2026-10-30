@@ -1,21 +1,16 @@
 # xenia-edge.nix — nixpkgs-style package for the has207/xenia-edge fork (branch: edge).
 #
-# nixpkgs-style usage (e.g. in all-packages.nix):
-#   xenia-edge = { fetchFromGitHub, ... }: import ./xenia-edge.nix { inherit fetchFromGitHub; ... };
-# or simply let callPackage pass the whole nixpkgs attrset.
+# Source: ./src.nix — the pinned superproject plus the 34 submodules the
+# x86_64 Linux build actually consumes, grafted (see that file for the
+# keep/drop split and re-pinning notes). Runtime data: ./data-src.nix.
 #
-# Local build against a local checkout:
-#   nix-build -E 'let p = import <nixpkgs> {}; in import ./xenia-edge.nix (p // { src = ./xenia-clean; });'
-#
-# `src` is an optional argument so local/testing builds can point at a local
-# checkout; when omitted, the pinned git revision (with all 42 submodules)
-# is fetched via fetchFromGitHub.
+# nixpkgs-style usage:
+#   xenia-edge = import ./xenia-edge.nix { stdenv = prev.clangStdenv; … };
+# (see xenia-edge-overlay.nix / eval-fod.nix for the full call).
 
 { stdenv
 , lib
-, fetchFromGitHub
 
-, clang
 , cmake
 , ninja
 , pkg-config
@@ -55,8 +50,6 @@
 , sdl3
 
 , patchelf
-
-, src ? null
 }:
 
 let
@@ -103,20 +96,6 @@ let
     "xcb-proto" "xdmcp" "zstd"
   ];
 
-  # Default source: head of the edge branch (FOD fetch verified via
-  # nix-build; full-build verification against this rev still pending),
-  # with all 42 submodules at their recorded commits.
-  defaultSrc = fetchFromGitHub {
-    owner = "has207";
-    repo = "xenia-edge";
-    rev = "f466500c3bec97ac0a070f183ecc27d30ef40579";
-    fetchSubmodules = true;
-    sha256 = "rU+y/PSA6iMPsQAjyali31D/vyL+Bm0j9+czGrrdFmg=";
-  };
-
-  # Computed here (not inside rec, where `src` would be self-referential).
-  srcArg = if src == null then defaultSrc else src;
-
   # Runtime data (game patches, game DB, controller DB, compatibility
   # data) pinned in ./data-src.nix; baked into $SRC_DIR/build/data_repos
   # in configurePhase, replacing xenia-build.py's fetch_data_repos().
@@ -126,7 +105,9 @@ stdenv.mkDerivation rec {
   pname = "xenia-edge";
   version = "f466500c3";
 
-  src = srcArg;
+  # Grafted source: superproject + the 34 submodules the build uses
+  # (see ./src.nix).
+  src = (import ./src.nix).src;
 
   patches = [
     ./patches/xenia-edge-cmake.diff
@@ -157,7 +138,10 @@ stdenv.mkDerivation rec {
     popd
   '';
 
-  nativeBuildInputs = [ clang cmake ninja pkg-config python3 patchelf ];
+  # Compiler: the caller passes `stdenv` as clangStdenv (see
+  # xenia-edge-overlay.nix), so the CC wrapper exports CC/CXX=clang —
+  # configurePhase needs no -DCMAKE_*_COMPILER flags.
+  nativeBuildInputs = [ cmake ninja pkg-config python3 patchelf ];
   buildInputs = all;
 
   preConfigure = ''
@@ -216,7 +200,7 @@ stdenv.mkDerivation rec {
 #define XE_BUILD_DATE __DATE__
 #endif  // GENERATED_VERSION_H_
 EOF
-    cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DXENIA_ENABLE_LTO=OFF "$SRC_DIR"
+    cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DXENIA_ENABLE_LTO=OFF "$SRC_DIR"
   '';
 
   buildPhase = ''
@@ -238,6 +222,18 @@ EOF
       printf '%s\n' "$RPATH" | tr ':' '\n'
       exit 1
     fi
+  '';
+
+  # libvulkan.so.1 is dlopen'd at runtime, never linked — so it is not a
+  # DT_NEEDED and CMake never recorded its store dir in RUNPATH. This must
+  # run in postFixup: nixpkgs' patchelf setup hook runs `patchelf
+  # --shrink-rpath` over every ELF in $out during fixupPhase, and
+  # shrink-rpath drops entries whose directory does not satisfy a
+  # DT_NEEDED — a dlopen'd lib has none, so an installPhase add would be
+  # silently deleted. DT_RUNPATH is consulted when resolving
+  # dlopen("libvulkan.so.1"), before the /lib and /usr/lib fallbacks.
+  postFixup = ''
+    patchelf --add-rpath "${vulkan-loader}/lib" "$out/bin/xenia_edge"
   '';
 
   doCheck = false;
