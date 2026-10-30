@@ -1,20 +1,7 @@
 let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
-  pkgs = import nixpkgs { overlays = [ 
-	(import ./eden-overlay.nix)
-	(import ./eden-overlay-hash.nix)
-	(import ./dolphin-emu-overlay.nix)
-	(import ./dolphin-emu-overlay-hash.nix)
-	(import ./flycast-overlay.nix)
-	(import ./flycast-overlay-hash.nix)
-	(import ./pcsx2-overlay.nix)
-	(import ./pcsx2-overlay-hash.nix)
-	(import ./rmg-overlay.nix)
-	(import ./rmg-overlay-hash.nix)
-	(import ./rpcs3-overlay.nix)
-	(import ./rpcs3-overlay-hash.nix)
-	(import ./xenia-canary-overlay.nix)
-	(import ./xenia-canary-overlay-hash.nix)
+  pkgs = import nixpkgs { overlays = [
+	(import ./xenia-edge-overlay.nix)
  ];};
   etc = pkgs.lib.fileset.toSource {
     root = ./.;
@@ -28,14 +15,25 @@ let
     root = ./.;
     fileset = ./entrypoint.sh;
   };
-#  share_dir= pkgs.lib.fileset.toSource {
-#    root = ./.;
-#    fileset = ./share;
-#  }; 
-#  cfg_dir = pkgs.lib.fileset.toSource {
-#    root = ./.;
-#    fileset = ./cfg;
-#  };
+  share_dir= pkgs.lib.fileset.toSource {
+    root = ./.;
+    fileset = ./share;
+  }; 
+  cfg_dir = pkgs.lib.fileset.toSource {
+    root = ./.;
+    fileset = ./cfg;
+  };
+  # Mesa's Vulkan ICD manifests live in $mesa/share/vulkan/icd.d, which
+  # the Vulkan loader never searches: this loader generation searches XDG
+  # locations ($HOME/.config/vulkan/icd.d first, then the XDG_CONFIG_DIRS
+  # entries, /run/opengl-driver/share, and /usr/share); older loaders
+  # search /etc/vulkan/icd.d. dockerTools merges this derivation's etc/
+  # into the image's /etc, and cont-init script 20-vulkan-icd.sh
+  # symlinks it into $HOME/.config/vulkan/.
+  vulkan-icd-etc = pkgs.runCommand "vulkan-icd-etc" {} ''
+    mkdir -p $out/etc/vulkan/icd.d
+    cp ${pkgs.mesa}/share/vulkan/icd.d/*.json $out/etc/vulkan/icd.d/
+  '';
 
 #  dol_retro = import ./dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
@@ -96,18 +94,13 @@ in pkgs.dockerTools.buildLayeredImage {
     etc
     opt
     entrypoint
-#    share_dir
-#    cfg_dir
+    share_dir
+    cfg_dir
+    vulkan-icd-etc
 
-#    dol_retro.dolphin-new
-    pkgs.dolphin-emu
-    pkgs.flycast
-    pkgs.rpcs3
-    pkgs.xemu
-    pkgs.rmg
-    pkgs.xenia-canary
-    pkgs.eden
-    pkgs.pcsx2
+    # The emulator for this image: has207/xenia-edge fork (branch edge).
+    # Package: ./xenia-edge.nix (overlay: ./xenia-edge-overlay.nix).
+    pkgs.xenia-edge
 
     pkgs.pegasus-frontend
 
