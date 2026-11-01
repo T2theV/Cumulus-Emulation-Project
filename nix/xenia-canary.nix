@@ -12,4 +12,7 @@ rec{
       version = "master";
       src = xc-src;
   });
+  patches = [
+    ./xenia-cmakelists.patch
+  ];
 }

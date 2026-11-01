@@ -1,5 +1,5 @@
 #!/bin/bash
-MESA=/nix/store/jg8f97fhfmkpccrm3lsxlavkivpjbs72-mesa-26.2.5
+MESA=/nix/store/j6846pd6a2i4bx16wcdn571sq7jznr71-mesa-26.2.6
 mkdir -p /home/retro/.config/vulkan/icd.d /etc/glvnd/egl_vendor.d
 ln -sf "$MESA/share/vulkan/icd.d/radeon_icd.x86_64.json" \
        /home/retro/.config/vulkan/icd.d/radeon_icd.x86_64.json
@@ -10,6 +10,6 @@ ln -sfnf "$MESA" /run/opengl-driver
 mkdir -p /tmp
 chmod 1777 /tmp
 mkdir -p /dev/input
-ln -s /nix/store/fdp9x7rhsspyj0xjv0cczj08fhj6z92y-glibc-locales-2.44-57/lib /usr
+ln -s /nix/store/fdp9x7rhsspyj0xjv0cczj08fhj6z92y-glibc-locales-2.44-57 /usr
 export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
 
