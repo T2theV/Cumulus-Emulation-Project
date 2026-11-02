@@ -10,7 +10,7 @@
 # callPackage would hand over the gcc stdenv.
 final: prev:
 {
-  xenia-edge = import ./xenia-edge.nix {
+  xenia-edge = import ../emus/xenia-edge/xenia-edge.nix {
     # clang toolchain: clangStdenv so the CC wrapper exports CC/CXX=clang
     # for the whole build (clang is no longer a package formal).
     stdenv = prev.clangStdenv;

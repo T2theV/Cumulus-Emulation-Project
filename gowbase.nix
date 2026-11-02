@@ -1,27 +1,37 @@
 let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
   pkgs = import nixpkgs { overlays = [
-	(import ./xenia-edge-overlay.nix)
+	(import ./overlays/xenia-edge-overlay.nix)
+	(import ./overlays/dolphin-emu-overlay.nix)
+	(import ./overlays/dolphin-emu-overlay-hash.nix)
+	(import ./overlays/flycast-overlay.nix)
+	(import ./overlays/flycast-overlay-hash.nix)
+	(import ./overlays/pcsx2-overlay.nix)
+	(import ./overlays/pcsx2-overlay-hash.nix)
+	(import ./overlays/rmg-overlay.nix)
+	(import ./overlays/rmg-overlay-hash.nix)
+	(import ./overlays/rpcs3-overlay.nix)
+	(import ./overlays/rpcs3-overlay-hash.nix)
  ];};
   etc = pkgs.lib.fileset.toSource {
     root = ./.;
-    fileset = ./etc;
+    fileset = ./supporting_files/gow/etc;
   };
   opt = pkgs.lib.fileset.toSource {
     root = ./.;
-    fileset = ./opt;
+    fileset = ./supporting_files/gow/opt;
   };
   entrypoint = pkgs.lib.fileset.toSource {
     root = ./.;
-    fileset = ./entrypoint.sh;
+    fileset = ./supporting_files/gow/entrypoint.sh;
   };
   share_dir= pkgs.lib.fileset.toSource {
     root = ./.;
-    fileset = ./share;
+    fileset = ./supporting_files/gow/share;
   }; 
   cfg_dir = pkgs.lib.fileset.toSource {
     root = ./.;
-    fileset = ./cfg;
+    fileset = ./supporting_files/gow/cfg;
   };
   # Mesa's Vulkan ICD manifests live in $mesa/share/vulkan/icd.d, which
   # the Vulkan loader never searches: this loader generation searches XDG
@@ -35,7 +45,7 @@ let
     cp ${pkgs.mesa}/share/vulkan/icd.d/*.json $out/etc/vulkan/icd.d/
   '';
 
-#  dol_retro = import ./dolphin.nix;
+#  dol_retro = import ./emus/dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
   name = "hello-docker";
   tag = "latest";
@@ -99,8 +109,15 @@ in pkgs.dockerTools.buildLayeredImage {
     vulkan-icd-etc
 
     # The emulator for this image: has207/xenia-edge fork (branch edge).
-    # Package: ./xenia-edge.nix (overlay: ./xenia-edge-overlay.nix).
+    # Package: ./emus/xenia-edge/xenia-edge.nix (overlay: ./overlays/xenia-edge-overlay.nix).
     pkgs.xenia-edge
+
+    pkgs.dolphin-emu
+    pkgs.flycast
+    pkgs.rpcs3
+    pkgs.xemu
+    pkgs.rmg
+    pkgs.pcsx2
 
     pkgs.pegasus-frontend
 
