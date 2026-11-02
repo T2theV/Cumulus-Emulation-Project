@@ -2,6 +2,8 @@ let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
   pkgs = import nixpkgs { overlays = [
 	(import ./overlays/xenia-edge-overlay.nix)
+	(import ./overlays/eden-overlay.nix)
+	(import ./overlays/eden-overlay-hash.nix)
 	(import ./overlays/dolphin-emu-overlay.nix)
 	(import ./overlays/dolphin-emu-overlay-hash.nix)
 	(import ./overlays/flycast-overlay.nix)
@@ -13,26 +15,6 @@ let
 	(import ./overlays/rpcs3-overlay.nix)
 	(import ./overlays/rpcs3-overlay-hash.nix)
  ];};
-  etc = pkgs.lib.fileset.toSource {
-    root = ./.;
-    fileset = ./supporting_files/gow/etc;
-  };
-  opt = pkgs.lib.fileset.toSource {
-    root = ./.;
-    fileset = ./supporting_files/gow/opt;
-  };
-  entrypoint = pkgs.lib.fileset.toSource {
-    root = ./.;
-    fileset = ./supporting_files/gow/entrypoint.sh;
-  };
-  share_dir= pkgs.lib.fileset.toSource {
-    root = ./.;
-    fileset = ./supporting_files/gow/share;
-  }; 
-  cfg_dir = pkgs.lib.fileset.toSource {
-    root = ./.;
-    fileset = ./supporting_files/gow/cfg;
-  };
   # Mesa's Vulkan ICD manifests live in $mesa/share/vulkan/icd.d, which
   # the Vulkan loader never searches: this loader generation searches XDG
   # locations ($HOME/.config/vulkan/icd.d first, then the XDG_CONFIG_DIRS
@@ -50,6 +32,28 @@ in pkgs.dockerTools.buildLayeredImage {
   name = "hello-docker";
   tag = "latest";
   contents = [ 
+  (pkgs.runCommand "entrypoint" {} ''
+    mkdir -p $out
+    cp ${./supporting_files/gow/entrypoint.sh} $out/entrypoint.sh
+  '')
+  (pkgs.runCommand "etc" {} ''
+    mkdir -p $out
+    cp -r ${./supporting_files/gow/etc} $out/etc
+  '')
+  (pkgs.runCommand "opt" {} ''
+    mkdir -p $out
+    cp -r ${./supporting_files/gow/opt} $out/opt
+  '')
+  (pkgs.runCommand "share" {} '' 
+    mkdir -p $out
+    cp -r ${./supporting_files/gow/share} $out/share
+  '')
+  (pkgs.runCommand "cfg" {} ''
+    mkdir -p $out
+    cp -r ${./supporting_files/gow/cfg} $out/cfg
+  '')
+
+
     pkgs.mesa
     pkgs.mesa.opencl
     pkgs.mesa.cross_tools
@@ -101,11 +105,11 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.fontconfig
     pkgs.glibcLocales
 
-    etc
-    opt
-    entrypoint
-    share_dir
-    cfg_dir
+#    etc
+#    opt
+#    entrypoint
+#    share_dir
+#    cfg_dir
     vulkan-icd-etc
 
     # The emulator for this image: has207/xenia-edge fork (branch edge).
