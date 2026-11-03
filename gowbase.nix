@@ -116,6 +116,7 @@ in pkgs.dockerTools.buildLayeredImage {
     # Package: ./emus/xenia-edge/xenia-edge.nix (overlay: ./overlays/xenia-edge-overlay.nix).
     pkgs.xenia-edge
 
+    pkgs.eden
     pkgs.dolphin-emu
     pkgs.flycast
     pkgs.rpcs3
