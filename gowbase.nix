@@ -40,6 +40,17 @@ in pkgs.dockerTools.buildLayeredImage {
     mkdir -p $out
     cp -r ${./supporting_files/gow/etc} $out/etc
   '')
+  # Canned emulator defaults ("canned init"). The trees land in /etc/cumulus-emu
+  # and are seeded into $HOME on first boot by /etc/cont-init.d/40-cumulus-canned.sh
+  # (installed via the "etc" layer above) calling /etc/cumulus-emu/overall.sh.
+  (pkgs.runCommand "cumulus-emu-canned" {} ''
+    mkdir -p $out
+    mkdir -p $out/etc/cumulus-emu
+    cp -r ${./gadgets/root/config} $out/etc/cumulus-emu/config
+    cp -r ${./gadgets/root/local} $out/etc/cumulus-emu/local
+    cp ${./gadgets/root/overall.sh} $out/etc/cumulus-emu/overall.sh
+    chmod +x $out/etc/cumulus-emu/overall.sh
+  '')
   (pkgs.runCommand "opt" {} ''
     mkdir -p $out
     cp -r ${./supporting_files/gow/opt} $out/opt
