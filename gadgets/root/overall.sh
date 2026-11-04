@@ -1,10 +1,19 @@
-#!/usr/bin/with-contenv bash
+#!/usr/bin/env bash
 
-# Define the source and destination directories
-source_dir1="/etc/cumulus-emu/config"
-source_dir2="/etc/cumulus-emu/local"
-destination_dir1="/config/.config"
-destination_dir2="/config/.local"
+# Seed directory. The image sets HOME=/home/retro; default it here if unset so
+# the seeder still lands in the right place when invoked directly.
+HOME="${HOME:-/home/retro}"
+
+# Define the source and destination directories.
+# Source: the bundled "canned" defaults installed to /etc/cumulus-emu by gowbase.nix.
+# Dest:   the XDG locations the emulators actually use in the live image:
+#          $HOME/.config          (XDG config: flycast, rpcs3, RMG, dolphin-emu,
+#                                  PCSX2, eden, xenia_edge.conf, ...)
+#          $HOME/.local/share     (XDG data:   Xenia, eden keys, xemu, duckstation, ...)
+source_dir1="${CUMULUS_SRC_CONFIG:-/etc/cumulus-emu/config}"
+source_dir2="${CUMULUS_SRC_LOCAL:-/etc/cumulus-emu/local}"
+destination_dir1="${HOME}/.config"
+destination_dir2="${HOME}/.local/share"
 
 # Function to copy files from a source directory to a destination directory
 copy_files() {
