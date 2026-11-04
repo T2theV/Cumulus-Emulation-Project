@@ -50,6 +50,10 @@ in pkgs.dockerTools.buildLayeredImage {
     cp -r ${./gadgets/root/local} $out/etc/cumulus-emu/local
     cp ${./gadgets/root/overall.sh} $out/etc/cumulus-emu/overall.sh
     chmod +x $out/etc/cumulus-emu/overall.sh
+    # PS3FirmwareInstall gadget -> /etc/cumulus-emu/PS3FirmwareInstall/
+    # (auto-run on first boot by /etc/cont-init.d/45-ps3-firmware.sh)
+    cp -r ${./gadgets/root/PS3FirmwareInstall} $out/etc/cumulus-emu/PS3FirmwareInstall
+    chmod +x $out/etc/cumulus-emu/PS3FirmwareInstall/install-ps3-firmware.sh
   '')
   (pkgs.runCommand "opt" {} ''
     mkdir -p $out
