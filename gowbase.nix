@@ -59,6 +59,11 @@ in pkgs.dockerTools.buildLayeredImage {
     #  Switch firmware zip is dropped in /ROMs/switch/firmware)
     cp -r ${./gadgets/root/EdenFirmwareInstall} $out/etc/cumulus-emu/EdenFirmwareInstall
     chmod +x $out/etc/cumulus-emu/EdenFirmwareInstall/install-eden-firmware.sh
+    # XboxHddRestore gadget -> /etc/cumulus-emu/XboxHddRestore/
+    # (auto-run at boot by /etc/cont-init.d/90-xbox-hdd.sh; restores XEMU's
+    #  hdd image into $HOME from the ROMs volume if it is missing)
+    cp -r ${./gadgets/root/XboxHddRestore} $out/etc/cumulus-emu/XboxHddRestore
+    chmod +x $out/etc/cumulus-emu/XboxHddRestore/ensure-xbox-hdd.sh
   '')
   (pkgs.runCommand "opt" {} ''
     mkdir -p $out
