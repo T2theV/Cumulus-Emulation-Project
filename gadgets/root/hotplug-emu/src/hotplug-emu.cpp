@@ -1,9 +1,10 @@
 // hotplug-emu — udev hotplug → emulator controller-config bridge for GOW (Cumulus EP)
 //
 // GOW's fake-udev broadcasts controller plug/unplug as NETLINK_KOBJECT_UEVENT
-// netlink events on the udev multicast group (group 2). This program listens
-// for those events, resolves what was plugged in from sysfs, and writes the
-// controller-emulation config files for the emulators in the container.
+// netlink events on the kernel uevent multicast group (group 1). This program
+// listens for those events, resolves what was plugged in from sysfs, and
+// writes the controller-emulation config files for the emulators in the
+// container.
 //
 // Modes:
 //   hotplug-emu daemon               background listener (started by prelaunch script)
@@ -719,9 +720,13 @@ static std::vector<Identity> scan_gamepads()
 }
 
 // ---------------------------------------------------------------------------
-// netlink: receive udev hotplug events (group 2), send synthetic ones
+// netlink: receive udev hotplug events, send synthetic ones.
+// The kernel exposes exactly ONE multicast group on NETLINK_KOBJECT_UEVENT
+// (lib/kobject_uevent.c: netlink_kernel_create with .groups = 1); kernel
+// uevents are broadcast to group 1. (The old "group 2" idea came from
+// libudev's monitor-group enum, which is NOT a netlink group number.)
 // ---------------------------------------------------------------------------
-static const int NL_GROUP_UDEV = 2;
+static const int NL_GROUP_UEVENT = 1;
 
 struct Uevent
 {
@@ -730,7 +735,10 @@ struct Uevent
     std::string devpath;
 };
 
-// payload (after nlmsghdr + 16-byte uevent header): NUL-terminated "KEY=VALUE" pairs
+// payload (right after nlmsghdr): NUL-terminated "KEY=VALUE" pairs. The kernel
+// sends "ACTION@/devpath\0" then KEY=VALUE pairs; udev sends a "libudev" magic
+// header then the same KEY=VALUE properties. We scan for KEY=VALUE pairs, so
+// both layouts parse identically.
 static std::vector<Uevent> parse_ueline(const unsigned char* payload, size_t len)
 {
     std::vector<Uevent> events;
@@ -791,10 +799,10 @@ static int nl_open_recv()
         ::close(fd);
         return -1;
     }
-    int grp = NL_GROUP_UDEV;
+    int grp = NL_GROUP_UEVENT;
     if (::setsockopt(fd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP, &grp, sizeof(grp)) != 0)
     {
-        logf("join group %d: %s", NL_GROUP_UDEV, strerror(errno));
+        logf("join group %d: %s", NL_GROUP_UEVENT, strerror(errno));
         ::close(fd);
         return -1;
     }
@@ -822,50 +830,85 @@ static bool nl_recv(int fd, std::vector<Uevent>& events)
     ssize_t n = ::recv(fd, buf.data(), buf.size(), 0);
     if (n <= 0)
         return false;
-    size_t off = 0;
-    while (off + NLMSG_HDRLEN <= static_cast<size_t>(n))
+    // The kernel / fake-udev may broadcast the raw uevent payload WITHOUT a
+    // netlink header (observed live: the first bytes are "ACTION@/devpath",
+    // not a nlmsghdr), while our synthetic selftests DO carry an nlmsghdr.
+    // Detect a valid header (nlmsg_len in [NLMSG_HDRLEN, n]); otherwise parse
+    // the whole buffer as NUL-separated KEY=VALUE tokens. This is what makes
+    // both the headered and the headerless layouts parse identically.
+    bool headered = false;
+    if (n >= NLMSG_HDRLEN)
     {
-        struct nlmsghdr* h = reinterpret_cast<struct nlmsghdr*>(buf.data() + off);
-        if (h->nlmsg_len < NLMSG_HDRLEN)
-            break;
-        size_t payload_off = NLMSG_HDRLEN + 16; // skip uevent {seq,sec,usec,cpu} header
-        if (h->nlmsg_len >= payload_off)
+        struct nlmsghdr* h0 = reinterpret_cast<struct nlmsghdr*>(buf.data());
+        headered = (h0->nlmsg_len >= NLMSG_HDRLEN) &&
+                   (h0->nlmsg_len <= static_cast<unsigned int>(n));
+    }
+    if (headered)
+    {
+        size_t off = 0;
+        while (off + NLMSG_HDRLEN <= static_cast<size_t>(n))
         {
-            auto evs = parse_ueline(buf.data() + off + payload_off, h->nlmsg_len - payload_off);
-            events.insert(events.end(), evs.begin(), evs.end());
+            struct nlmsghdr* h = reinterpret_cast<struct nlmsghdr*>(buf.data() + off);
+            if (h->nlmsg_len < NLMSG_HDRLEN)
+                break;
+            if (h->nlmsg_len > NLMSG_HDRLEN)
+            {
+                auto evs = parse_ueline(buf.data() + off + NLMSG_HDRLEN,
+                                        h->nlmsg_len - NLMSG_HDRLEN);
+                events.insert(events.end(), evs.begin(), evs.end());
+            }
+            off += NLMSG_ALIGN(h->nlmsg_len);
         }
-        off += NLMSG_ALIGN(h->nlmsg_len);
+    }
+    else
+    {
+        auto evs = parse_ueline(buf.data(), static_cast<size_t>(n));
+        events.insert(events.end(), evs.begin(), evs.end());
     }
     return !events.empty();
 }
 
-// Emit a synthetic uevent exactly the way fake-udev does: one netlink message
-// to the udev multicast group (group 2) with a 16-byte udev header + payload.
+// Emit a synthetic uevent the way the kernel does: one netlink message to the
+// uevent multicast group (group 1), payload = NUL-terminated "KEY=VALUE"
+// pairs (no extra header). Multicast send REQUIRES sendto() with nl_groups
+// set: a plain send() leaves nl_groups=0, so the kernel unicasts to its own
+// socket (portid 0) and group members never see the message. (connect() to a
+// group is rejected with EPERM; this sendto recipe is the one that works.)
 static bool nl_send_event(const std::string& action, const std::string& devname, const std::string& devpath)
 {
+    // NB: NUL separators must be appended as single chars (push_back('\0')).
+    // `payload += "...\\0"` uses strlen and silently drops the NUL, which
+    // would glue every key into one unparseable token.
     std::string payload;
-    payload += "ACTION=" + action + "\0";
-    payload += "DEVNAME=" + devname + "\0";
+    payload += "ACTION=";
+    payload += action;
+    payload.push_back('\0');
+    payload += "DEVNAME=";
+    payload += devname;
+    payload.push_back('\0');
     if (!devpath.empty())
-        payload += "DEVPATH=" + devpath + "\0";
-    payload += "SEQNUM=99999\0";
-    payload += "SUBSYSTEM=input\0";
-    payload += "ID_INPUT=1\0";
-    payload += "ID_INPUT_JOYSTICK=1\0";
+    {
+        payload += "DEVPATH=";
+        payload += devpath;
+        payload.push_back('\0');
+    }
+    payload += "SUBSYSTEM=input";
+    payload.push_back('\0');
+    payload += "SEQNUM=99999";
+    payload.push_back('\0');
+    payload += "ID_INPUT=1";
+    payload.push_back('\0');
+    payload += "ID_INPUT_JOYSTICK=1";
+    payload.push_back('\0');
 
-    std::vector<unsigned char> msg(NLMSG_HDRLEN + 16 + payload.size(), 0);
+    std::vector<unsigned char> msg(NLMSG_HDRLEN + payload.size(), 0);
     struct nlmsghdr* h = reinterpret_cast<struct nlmsghdr*>(msg.data());
     h->nlmsg_len = static_cast<unsigned int>(msg.size());
-    h->nlmsg_type = 0x8000; // NLMSG_MULTICAST — multicast send to the udev group
+    h->nlmsg_type = 0x8000; // NLMSG_MULTICAST
     h->nlmsg_flags = 0;
     h->nlmsg_seq = 0;
     h->nlmsg_pid = 0;
-    uint32_t* uh = reinterpret_cast<uint32_t*>(msg.data() + NLMSG_HDRLEN);
-    uh[0] = 1; // seq
-    uh[1] = 0; // timestamp sec
-    uh[2] = 0; // timestamp usec
-    uh[3] = 0; // cpu
-    memcpy(msg.data() + NLMSG_HDRLEN + 16, payload.data(), payload.size());
+    memcpy(msg.data() + NLMSG_HDRLEN, payload.data(), payload.size());
 
     int fd = ::socket(AF_NETLINK, SOCK_RAW | SOCK_CLOEXEC, NETLINK_KOBJECT_UEVENT);
     if (fd < 0)
@@ -883,25 +926,26 @@ static bool nl_send_event(const std::string& action, const std::string& devname,
         ::close(fd);
         return false;
     }
-    int grp = NL_GROUP_UDEV;
-    // Multicast send on this kernel: join the group, then send() with
-    // nlmsg_type = NLMSG_MULTICAST — connect(group) is rejected with EPERM.
-    if (::setsockopt(fd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP, &grp, sizeof(grp)) != 0)
-    {
-        logf("join group %d: %s", NL_GROUP_UDEV, strerror(errno));
-        ::close(fd);
-        return false;
-    }
+    // Multicast destination: the uevent group. nl_groups is a bitmask where bit
+    // N-1 selects group N; nl_pid=0 marks a kernel-style unicast counterpart
+    // (the kernel's own socket; its rcv handler ignores it — harmless).
+    struct sockaddr_nl dest;
+    memset(&dest, 0, sizeof(dest));
+    dest.nl_family = AF_NETLINK;
+    dest.nl_pid = 0;
+    dest.nl_groups = 1u << (NL_GROUP_UEVENT - 1); // group 1 -> bit 0 -> 1
+
     size_t off = 0;
     bool ok = true;
     while (off < msg.size())
     {
-        ssize_t sn = ::send(fd, msg.data() + off, msg.size() - off, 0);
+        ssize_t sn = ::sendto(fd, msg.data() + off, msg.size() - off, 0,
+                              reinterpret_cast<struct sockaddr*>(&dest), sizeof(dest));
         if (sn < 0)
         {
             if (errno == EINTR)
                 continue;
-            logf("send: %s", strerror(errno));
+            logf("sendto(group %d): %s", NL_GROUP_UEVENT, strerror(errno));
             ok = false;
             break;
         }
@@ -988,6 +1032,10 @@ static bool same_input_device(const State& st, const std::string& devname, const
 {
     if (st.device == devname)
         return true;
+    // The kernel's uevent carries DEVNAME=input/event9 (no /dev prefix);
+    // state stores /dev/input/event9. Accept both spellings.
+    if (st.device == "/dev/" + devname || st.device == "/" + devname)
+        return true;
     auto prefix = [](const std::string& dp) -> std::string {
         size_t i = dp.find("/event");
         if (i == std::string::npos)
@@ -1030,6 +1078,8 @@ static void daemon_main(const Cfg& cfg)
         auto id = scan[0];
         st.profile = id.profile;
         st.device = id.devname;
+        st.devpath = id.devpath;
+        st.uniq = id.uniq;
         st.sdl_index = id.sdl_index;
         if (fresh)
         {
@@ -1044,13 +1094,16 @@ static void daemon_main(const Cfg& cfg)
         logf("startup: no controller present");
     }
 
-    int fd = nl_open_recv();
+    int fd = -1;
+    if (!::getenv("HPEMU_NONETLINK"))
+        fd = nl_open_recv();
     if (fd >= 0)
-        logf("listening for udev hotplug events (netlink group %d)", NL_GROUP_UDEV);
+        logf("listening for udev hotplug events (netlink group %d)", NL_GROUP_UEVENT);
     else
         logf("WARNING: netlink unavailable — falling back to sysfs rescan only");
 
     time_t last_rescan = time(nullptr);
+    size_t last_rescount = scan.size();
     {
         // pid file for the prelaunch script / ops
         std::string pidfile = cfg.rundir + "/pid";
@@ -1091,6 +1144,10 @@ static void daemon_main(const Cfg& cfg)
         {
             last_rescan = now;
             auto cur = scan_gamepads();
+            if (cur.size() != last_rescount)
+                logf("rescan: %zu gamepad(s) (tracked: %s)", cur.size(),
+                     st.device.empty() ? "none" : st.device.c_str());
+            last_rescount = cur.size();
             if (st.device.empty())
             {
                 if (cur.size() >= 1)
@@ -1178,6 +1235,16 @@ static bool do_selftest(const Cfg& cfg, bool plug)
     return ok;
 }
 
+// Test hook: emit a synthetic uevent for a specific device (lets us exercise
+// the remove path against a real device that is actually in sysfs).
+static bool do_uesim(const Cfg& cfg, const std::string& action, const std::string& devname, const std::string& devpath)
+{
+    (void)cfg;
+    bool ok = nl_send_event(action, devname, devpath);
+    logf("uesim: sent %s for %s (%s)", action.c_str(), devname.c_str(), ok ? "ok" : "FAILED");
+    return ok;
+}
+
 static void usage()
 {
     fprintf(stderr,
@@ -1187,7 +1254,9 @@ static void usage()
             "  apply [--all]       one-shot apply of current controller state\n"
             "  status               show detected controller + applied state\n"
             "  selftest-plug       emit synthetic add uevent (testing)\n"
-            "  selftest-unplug     emit synthetic remove uevent (testing)\n");
+            "  selftest-unplug     emit synthetic remove uevent (testing)\n"
+            "  probe <devname>     dump sysfs resolution for a device (diagnostics)\n"
+            "  uesim <act> <dev> <devpath>   emit synthetic uevent for a device (testing)\n");
 }
 
 int main(int argc, char** argv)
@@ -1231,6 +1300,15 @@ int main(int argc, char** argv)
         return do_selftest(cfg, true) ? 0 : 1;
     if (mode == "selftest-unplug")
         return do_selftest(cfg, false) ? 0 : 1;
+    if (mode == "uesim")
+    {
+        if (argc < 5)
+        {
+            fprintf(stderr, "usage: hotplug-emu uesim <add|remove|change> <devname> <devpath>\n");
+            return 2;
+        }
+        return do_uesim(cfg, argv[2], argv[3], argv[4]) ? 0 : 1;
+    }
     if (mode == "help" || mode == "--help" || mode == "-h")
     {
         usage();
