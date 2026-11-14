@@ -105,6 +105,11 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.fontconfig
     pkgs.glibcLocales
 
+    # Internet access: ping, DNS lookup, and CA certificates for TLS
+    pkgs.iputils        # ping (iputils)
+    pkgs.dnsutils       # dig / nslookup (bind dnsutils)
+    pkgs.cacert         # CA certificates (nss-cacert) for TLS verification
+
 #    etc
 #    opt
 #    entrypoint
