@@ -27,6 +27,34 @@ let
     cp ${pkgs.mesa}/share/vulkan/icd.d/*.json $out/etc/vulkan/icd.d/
   '';
 
+  # fix-gpu-renderer.sh, generated at evaluation time. The nixpkgs
+  # fetchTarball above is floating, so every evaluation of this file
+  # resolves to a different /nix/store hash: a static copy of the script
+  # (as previously shipped under supporting_files/gow/opt/) bakes in
+  # store paths that are no longer present in the image, leaving
+  # /run/opengl-driver, the Vulkan ICD and the locale-archive symlinks
+  # dangling. ${pkgs.mesa} / ${pkgs.glibcLocales} are interpolated at
+  # evaluation time, so the paths in the script always match the
+  # revision this file resolves to. The "opt" content below installs it
+  # as /opt/gow/fix-gpu-renderer.sh, which entrypoint.sh sources.
+  fix-gpu-renderer = pkgs.writeScript "fix-gpu-renderer.sh" ''
+    #!/bin/bash
+    MESA=${pkgs.mesa}
+    GLIBC_LOCALES=${pkgs.glibcLocales}
+    mkdir -p /home/retro/.config/vulkan/icd.d /etc/glvnd/egl_vendor.d
+    ln -sf "$MESA/share/vulkan/icd.d/radeon_icd.x86_64.json" \
+          /home/retro/.config/vulkan/icd.d/radeon_icd.x86_64.json
+    ln -sf "$MESA/share/glvnd/egl_vendor.d/50_mesa.json" \
+          /etc/glvnd/egl_vendor.d/50_mesa.json
+    mkdir -p /run
+    ln -sfnf "$MESA" /run/opengl-driver
+    mkdir -p /tmp
+    chmod 1777 /tmp
+    mkdir -p /dev/input
+    ln -s "$GLIBC_LOCALES/lib" /usr
+    export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
+  '';
+
 #  dol_retro = import ./emus/dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
   name = "hello-docker";
@@ -43,6 +71,10 @@ in pkgs.dockerTools.buildLayeredImage {
   (pkgs.runCommand "opt" {} ''
     mkdir -p $out
     cp -r ${./supporting_files/gow/opt} $out/opt
+    # fix-gpu-renderer.sh is generated at evaluation time (see above) so
+    # its MESA/glibc-locales store paths always match this build's
+    # nixpkgs revision — it cannot be a static file here.
+    cp ${fix-gpu-renderer} $out/opt/gow/fix-gpu-renderer.sh
   '')
   (pkgs.runCommand "share" {} '' 
     mkdir -p $out
