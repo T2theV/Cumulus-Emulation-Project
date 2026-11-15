@@ -1,56 +1,73 @@
 # Cumulus Emulation Project
-Latest Emulatiors In the Cloud. 
+The Quest to be the perfect Emulation Gaming Container.
+Run your favorites On your own hardware!
 
-## Building
-```
-cd nix/
-docker buildx build -t <your-tag> .
-```
+Every Emulator has enough testing making it safe for rolling release usag. No more waiting for next quarter to get the latest features. Get the latest improvements already optimized for 1080p, No tinkering with backends, It just works!
+
+Included Emulators:
+
+| Emulator | Executable | Rom Folder |
+| --- |--- | --- |
+| Eden | eden --platform xcb | switch, switch-updates |
+| Dolphin | dolphin-emu | gc, wii |
+| Flycast | flycast | dreamcast |
+| PCSX2 | pcsx2-qt | ps2 |
+| RMG | RMG | n64 |
+| RPCS3 | rpcs3 -platform xcb | ps3 |
+| Xemu | xemu | xbox |
+| Xenia Edge | xenia-edge | xbox360 |
 
 ## Running the Image
 
-To run the image:
-
-`docker run -v path-to-roms:/ROMs -v path-to-config:/config -p 3001:3001 -e RUN_EMU <supported emultor> cumulus-ep:latest`
-
-Supported Emulators:
-
-| Emulator | RUN_RMU |
-| --- | --- |
-| Eden | eden |
-| Dolphin | dolphin-emu |
-| Flycast | flycast |
-| PCSX2 | pcsx2-qt |
-| RPCS3 | rpcs3 |
-| Xenia Canary | xenia_canary |
-
-
-Open your browser and go to "http://localhost:3001" You'll see your emulation-ready desktop.
-
-This is a compose file to run the image with more features.
-
-```yaml
-services:
-  emulation:
-    image: ghcr.io/t2thev/cumulus-ep:latest
-    volumes:
-      - /path/to/config:/config
-    devices:
-      - /dev/dri/renderD128
-    ports: 
-      - 3001:3001
-    restart: unless-stopped
-    security_opt:
-      - seccomp:unconfined
+Currently, an Application for Games On Whales is the only supported route. Add the code below to your wolf/cfg/wolf.cfg file:
 ```
+    [[profiles.apps]]
+    icon_png_path = 'https://raw.githubusercontent.com/T2theV/Cumulus-Emulation-Project/icon/icons/Cumulus_Scaled.png'
+    title = 'Cumulus'
+
+        [profiles.apps.runner]
+        base_create_json = '''{
+  "HostConfig": {
+    "IpcMode": "host",
+    "Privileged": false,
+    "Ulimits": [{"Name":"memlock", "Hard":-1, "Soft":-1}],
+    "SecurityOpt": ["seccomp=unconfined", "apparmor=unconfined"],
+    "CapAdd": ["SYS_ADMIN", "SYS_NICE", "SYS_PTRACE", "NET_RAW", "MKNOD", "NET_ADMIN"],
+    "DeviceCgroupRules": ["c 13:* rmw", "c 244:* rmw"]
+  }
+}
+'''
+        devices = []
+        env = [ 'RUN_GAMESCOPE=1', 'GOW_REQUIRED_DEVICES=/dev/input/event* /dev/dri/* /dev/nvidia*' ]
+        image = 'ghcr.io/t2thev/cumulus-emulation-project:latest'
+        mounts = [ '</path/to/your/roms>:/ROMs' ]
+        name = 'cumulusEP'
+        ports = []
+        type = 'docker'
+```
+## Prepping your Library
+Use skyscraper to create the Pegasus Metadata file. Modify it to utilize your library. Pegasus searches for metadata files in ```/ROMS/<console code>```
+## TODO Sample
+
+## Building
+```
+cd emulators/
+./localbuild.sh
+cd ..
+NIXPKGS_ALLOW_UNFREE=1 nix-build gowbase.nix
+```                                         
+### Build in docker
+From the checkout root:
+```
+docker run --rm -v ./:/work nixos/nix nix-shel -p jq curl bash --command ' cd /work/wmulators && ./localbuild.sh && cd .. && NIXPKGS_ALLOW_UNFREE=1 nix-build gowimage.nix && cp $(nix-store --query ./result) ./CEP.tar.gz'
+```
+Then load into your docer instance
+
+```docker load -i CEP.tar.gz```
 
 ## How it works
-Based on a custom Linuxserver image, the base  project used selkies. This
-image is meant to run one supported emulator on the 3001 port. 
-
-Nix is used to build up-to-date versions of the Emulators. With nix though,
-that does make the emulators somewhat cutsom. for example, when compatible,
-there is no OpenGL support.
+Nix is used to build up-to-date versions of the Emulators. 
+Overlays are applied to pull in the new Revisions and changes against current unstable Nix branch of packages. Nurl is used to get the new hashes for the source and save as JSON files. With all data in place, the build takes place.
 
 ## Contributing
 **I NEED YOUR HELP!!!**
