@@ -43,7 +43,7 @@ in rec {
   #    updates — the build error prints the new hash.
   compatibility-data = p.fetchurl {
     url = "https://github.com/xenia-canary/game-compatibility/releases/download/game-compatibility/compatibility_data.json";
-    sha256 = "37c4c76b6856934a05bb0452612b5969cdfc0191a3525a49dfa69d722e1aff27";
+    sha256 = "48c958d166be9da4b5c6460e3c2dd5a7bc8073f3e378e7fa9dbcbfc1fcde1603";
   };
 
   # Combined tree mirroring build/data_repos/, plus the vendored
