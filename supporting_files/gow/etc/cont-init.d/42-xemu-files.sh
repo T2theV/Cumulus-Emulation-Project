@@ -5,9 +5,8 @@
 # block with $HOME-literal placeholder paths. XEMU needs:
 #   bootrom  mcpx_1.0.bin          (from /ROMs/bios/xbox/XEMU FILES/)
 #   flashrom Complex_4627v1.03.bin (from /ROMs/bios/xbox/XEMU FILES/)
-#   eeprom   eeprom.bin            (no copy source on this system; XEMU
-#                                    owns/creates it — we just guarantee the
-#                                    path exists)
+#   eeprom   eeprom.bin            (not seeded at all — XEMU creates/owns
+#                                    it on its own; users edit it themselves)
 #   hdd      xbox_hdd.qcow2        (restored by 90-xbox-hdd.sh)
 #
 # This script copies the two ROMs files into $HOME/.local/share/xemu/
@@ -40,10 +39,6 @@ copy_if_missing() {
 mkdir -p "$XEMU_DIR"
 copy_if_missing "${XBOX_BIOS}/Boot ROM Image/mcpx_1.0.bin" "${XEMU_DIR}/mcpx_1.0.bin"
 copy_if_missing "${XBOX_BIOS}/BIOS/Complex_4627v1.03.bin" "${XEMU_DIR}/Complex_4627v1.03.bin"
-
-# eeprom: no copy source. Touch so the toml path is always valid; XEMU
-# will populate/rewrite it as needed (it runs as retro).
-[ -f "${XEMU_DIR}/eeprom.bin" ] || : > "${XEMU_DIR}/eeprom.bin"
 
 # Rewrite the [sys.files] block in the toml. It is the last section of
 # this config, so delete from the header to EOF and append a clean block.
