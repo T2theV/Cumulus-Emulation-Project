@@ -17,17 +17,19 @@ destination_dir2="${HOME}/.local/share"
 
 # Function to copy files from a source directory to a destination directory
 copy_files() {
-  local source_dir=$1
-  local destination_dir=$2
+    local source_dir=$1
+    local destination_dir=$2
 
-  # Check if the destination directory exists, if not create it
-  if [ ! -d "$destination_dir" ]; then
-    mkdir -p "$destination_dir"
-    echo "Destination directory created: $destination_dir"
-  fi
+    # Check if the destination directory exists, if not create it
+    if [ ! -d "$destination_dir" ]; then
+        mkdir -p "$destination_dir"
+        echo "Destination directory created: $destination_dir"
+    fi
 
-  # List all files in the source directory
-  files_to_copy=$(find "$source_dir" -type f)
+    # List all files in the source directory. -L: the image layer ships these
+    # trees as symlinks into /nix/store, and plain `find -type f` never matches
+    # symlinks — without -L the loop iterates zero times and nothing is seeded.
+    files_to_copy=$(find -L "$source_dir" -type f)
 
   # Loop through each file and copy if it does not exist in the destination directory
   for file in $files_to_copy; do
