@@ -49,6 +49,15 @@ copy_files() {
   done
 }
 
-# Call the function for each pair of source and destination directories
+# Call the function for each pair of source and destination trees
 copy_files "$source_dir1" "$destination_dir1"
 copy_files "$source_dir2" "$destination_dir2"
+
+# Hand ownership back to the emulator user. The seeder runs as root during
+# container init; root-owned files (644) and directories (755) in these
+# trees block the emulators from writing configs/caches at runtime (xenia
+# crashed on a Permission denied creating its cache dirs). chown -R every
+# boot also repairs any tree already contaminated by an earlier boot.
+# Nonfatal: a missing user (weird boot) must never block container start.
+chown -R retro:retro "$destination_dir1" "$destination_dir2" 2>/dev/null \
+    || echo "[overall.sh] warning: could not chown seeded trees to retro"
