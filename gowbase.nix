@@ -57,7 +57,7 @@ let
 
 #  dol_retro = import ./emus/dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
-  name = "hello-docker";
+  name = "cep-candidate-test";
   tag = "latest";
   contents = [ 
   (pkgs.runCommand "entrypoint" {} ''
@@ -111,6 +111,15 @@ in pkgs.dockerTools.buildLayeredImage {
   (pkgs.runCommand "cfg" {} ''
     mkdir -p $out
     cp -r ${./supporting_files/gow/cfg} $out/cfg
+  '')
+  # /tmp must exist from container start: the entrypoint sources every
+  # /etc/cont-init.d/*.sh before fix-gpu-renderer.sh (which does
+  # mkdir -p /tmp), and init gadgets such as PS3FirmwareInstall write
+  # /tmp during init. Baked into the image; fix-gpu-renderer.sh's
+  # mkdir -p remains as a harmless no-op.
+  (pkgs.runCommand "tmp" {} ''
+    mkdir -p $out/tmp
+    chmod 1777 $out/tmp
   '')
 
 

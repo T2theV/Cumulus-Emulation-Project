@@ -29,7 +29,7 @@ for f in "$registered"/*.nca "$registered"/*.NCA; do
 done
 if [ -n "$present" ]; then
   gow_log "[50-eden-firmware] Eden firmware already present in $registered; skipping"
-  exit 0
+  return 0
 fi
 
 # Nothing dropped yet? -> skip silently (user installs on demand).
@@ -39,7 +39,7 @@ for f in "$firmware_dir"/*.zip "$firmware_dir"/*.ZIP "$firmware_dir"/*.7z; do
 done
 if [ -z "$fw" ]; then
   gow_log "[50-eden-firmware] no Switch firmware zip in $firmware_dir; skipping"
-  exit 0
+  return 0
 fi
 
 if [ -x "$gadget" ]; then
