@@ -50,6 +50,8 @@
 , sdl3
 
 , patchelf
+
+, compatibilityData ? null
 }:
 
 let
@@ -98,8 +100,11 @@ let
 
   # Runtime data (game patches, game DB, controller DB, compatibility
   # data) pinned in ./data-src.nix; baked into $SRC_DIR/build/data_repos
-  # in configurePhase, replacing xenia-build.py's fetch_data_repos().
-  dataRepos = (import ./data-src.nix).data-repos;
+  # in configurePhase, replacing xenia-build.py's fetch_data_repos(). The
+  # compatibility DB is optional (data-src.nix): `compatibilityData` is a
+  # fetchurl from the live hash (overlays/fetch-compat-hash.sh), or null to
+  # skip the compatibility DB entirely.
+  dataRepos = (import ./data-src.nix { compatibilityData = compatibilityData; }).data-repos;
 in
 stdenv.mkDerivation rec {
   pname = "xenia-edge";
