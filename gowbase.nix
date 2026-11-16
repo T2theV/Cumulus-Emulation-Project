@@ -57,7 +57,7 @@ let
 
 #  dol_retro = import ./emus/dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
-  name = "cep-candidate-test";
+  name = "ghcr.io/t2thev/cumulus-emulation-project";
   tag = "latest";
   contents = [ 
   (pkgs.runCommand "entrypoint" {} ''
