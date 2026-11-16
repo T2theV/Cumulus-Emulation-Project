@@ -84,7 +84,7 @@ in pkgs.dockerTools.buildLayeredImage {
     chmod +x $out/etc/cumulus-emu/PS3FirmwareInstall/install-ps3-firmware.sh
     # EdenFirmwareInstall gadget -> /etc/cumulus-emu/EdenFirmwareInstall/
     # (auto-run on first boot by /etc/cont-init.d/50-eden-firmware.sh when a
-    #  Switch firmware zip is dropped in /ROMs/switch/firmware)
+    #  Switch firmware zip is dropped in /ROMs/bios/switch)
     cp -r ${./gadgets/root/EdenFirmwareInstall} $out/etc/cumulus-emu/EdenFirmwareInstall
     chmod +x $out/etc/cumulus-emu/EdenFirmwareInstall/install-eden-firmware.sh
     # XboxHddRestore gadget -> /etc/cumulus-emu/XboxHddRestore/

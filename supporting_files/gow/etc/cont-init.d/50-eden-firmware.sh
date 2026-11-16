@@ -10,16 +10,16 @@
 # block container startup -- Eden simply won't run until it is installed.
 #
 # Sources (mounted ROMs volume):
-#   firmware : /ROMs/switch/firmware/*.zip
-#   keys     : /ROMs/switch/keys/{prod.keys,title.keys,key_retail.bin}
+#   firmware : /ROMs/bios/switch/*.zip
+#   keys     : /ROMs/bios/switch/{prod.keys,title.keys,key_retail.bin}
 # Install logic: /etc/cumulus-emu/EdenFirmwareInstall/install-eden-firmware.sh
 #                (the "EdenFirmwareInstall" gadget, see gowbase.nix).
 #
 HOME="${HOME:-/home/retro}"
 data_dir="${HOME}/.local/share/eden"
 registered="${data_dir}/nand/system/Contents/registered"
-firmware_dir="/ROMs/switch/firmware"
-keys_dir="/ROMs/switch/keys"
+firmware_dir="/ROMs/bios/switch"
+keys_dir="/ROMs/bios/switch"
 gadget="/etc/cumulus-emu/EdenFirmwareInstall/install-eden-firmware.sh"
 
 # Already installed? -> nothing to do (fast path on returning boots).
