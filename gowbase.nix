@@ -71,6 +71,9 @@ in pkgs.dockerTools.buildLayeredImage {
   (pkgs.runCommand "opt" {} ''
     mkdir -p $out
     cp -r ${./supporting_files/gow/opt} $out/opt
+    # cp -r preserves the store path's read-only perms (555 dirs / 444 files),
+    # so make the copied tree writable before adding fix-gpu-renderer.sh below.
+    chmod -R u+w $out
     # fix-gpu-renderer.sh is generated at evaluation time (see above) so
     # its MESA/glibc-locales store paths always match this build's
     # nixpkgs revision — it cannot be a static file here.
