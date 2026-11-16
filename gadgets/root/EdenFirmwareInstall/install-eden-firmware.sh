@@ -19,7 +19,8 @@
 #
 # Usage:
 #   install-eden-firmware.sh [firmware-zip] [key-file-or-dir ...]
-#     - no args   : auto-detect a .zip in FIRMWARE_DIR and keys in KEYS_DIR
+#     - no args   : auto-detect the NEWEST firmware zip in FIRMWARE_DIR
+#                   (by the version in the filename) and keys in KEYS_DIR
 #     - with args : install that zip and/or key file(s)/dir (a dir is scanned for
 #                   prod.keys / title.keys / key_retail.bin)
 #
@@ -58,6 +59,35 @@ fail=0
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 
+# --- firmware version helpers (pure bash: no grep/sort in the image) ------
+fw_version() { # $1 = a filename; print the first dotted-numeric run (23.0.1)
+  local rest=$1 w
+  rest=${rest//[!0-9.]/ }
+  for w in $rest; do
+    w=${w#.}                                   # trim a leading dot
+    while [ "${w%.}" != "$w" ]; do w=${w%.}; done   # trim trailing dots
+    case $w in *[!0-9.]*) continue ;; esac           # digits/dots only
+    case $w in *.*) printf '%s\n' "$w"; return 0 ;; esac
+  done
+  return 1
+}
+
+is_newer_fw() { # true if dotted version $1 is strictly newer than $2
+  local a b x y n i
+  IFS=. read -r -a a <<< "$1"
+  IFS=. read -r -a b <<< "$2"
+  n=${#a[@]}
+  [ "${#b[@]}" -gt "$n" ] && n=${#b[@]}
+  for (( i = 0; i < n; i++ )); do
+    x=0; y=0
+    [ -n "${a[i]:-}" ] && x=$((10#${a[i]}))
+    [ -n "${b[i]:-}" ] && y=$((10#${b[i]}))
+    [ "$x" -gt "$y" ] && return 0
+    [ "$x" -lt "$y" ] && return 1
+  done
+  return 1
+}
+
 # --- locate an extractor (7z on PATH; /nix/store python3 zipfile fallback) --
 extractor=""
 py_bin=""
@@ -84,13 +114,28 @@ if [ -n "$firmware" ]; then
   [ -f "$firmware" ] || [ -f "$FIRMWARE_DIR/$firmware" ] || die "firmware not found: $firmware"
   [ -f "$firmware" ] || firmware="$FIRMWARE_DIR/$firmware"
 else
-  # auto-detect: prefer a *Firmware* zip, else the first .zip in FIRMWARE_DIR
+  # auto-detect: prefer *Firmware* zips; among the matches, the one whose
+  # filename carries the NEWEST version (dotted numbers -- "Firmware
+  # 23.0.1.zip" beats "Firmware 17.0.0.zip"). If no candidate has a
+  # parseable version, fall back to the first (old behaviour).
+  fw_candidates=()
   for f in "$FIRMWARE_DIR"/*.zip "$FIRMWARE_DIR"/*.ZIP "$FIRMWARE_DIR"/*.7z; do
     [ -f "$f" ] || continue
     b="${f##*/}"
-    case "$b" in *Firmware*|*firmware*) firmware="$f"; break ;; esac
+    case "$b" in *Firmware*|*firmware*) fw_candidates+=("$f") ;; esac
   done
-  [ -n "$firmware" ] || for f in "$FIRMWARE_DIR"/*.zip; do [ -f "$f" ] && firmware="$f" && break; done
+  [ "${#fw_candidates[@]}" -gt 0 ] || for f in "$FIRMWARE_DIR"/*.zip; do [ -f "$f" ] && fw_candidates+=("$f"); done
+  if [ "${#fw_candidates[@]}" -gt 0 ]; then
+    fw_best="" fw_best_ver=""
+    for c in "${fw_candidates[@]}"; do
+      v="$(fw_version "${c##*/}")" || continue
+      if [ -z "$fw_best_ver" ] || is_newer_fw "$v" "$fw_best_ver"; then
+        fw_best_ver="$v"; fw_best="$c"
+      fi
+    done
+    [ -n "$fw_best" ] || fw_best="${fw_candidates[0]}"
+    firmware="$fw_best"
+  fi
 fi
 have_firmware=0
 [ -n "$firmware" ] && [ -f "$firmware" ] && have_firmware=1
