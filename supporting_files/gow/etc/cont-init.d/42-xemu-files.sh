@@ -61,7 +61,8 @@ fi
 
 # We run as root during init; xemu runs as retro. Hand ownership back
 # (same trap as the 40 seeder — root-owned files crash the emulator).
-chown -R retro:retro "$XEMU_DIR" "${HOME:-/home/retro}/xbox_hdd.qcow2" 2>/dev/null \
+# The hdd is chowned by 90-xbox-hdd.sh, which runs later.
+chown -R retro:retro "$XEMU_DIR" 2>/dev/null \
   || echo "[42-xemu-files] warning: could not chown xemu files to retro"
 
 return 0
