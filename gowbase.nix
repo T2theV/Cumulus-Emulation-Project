@@ -55,6 +55,60 @@ let
     export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
   '';
 
+  # --------------------------------------------------------------------------
+  # cartouche-libs.sh — runtime library symlinks for cartouche (Godot).
+  #
+  # Cartouche dlopens its display/audio libraries by SONAME at runtime, but
+  # Nix glibc only searches the binary's own RUNPATH, LD_LIBRARY_PATH and
+  # the ld.so cache — never /lib or /usr/lib. Mesa's Vulkan ICD resolves its
+  # own deps through Nix RUNPATH, but the Godot export can't, so the image's
+  # libs are invisible to cartouche and startup fails.
+  #
+  # This script creates SONAME symlinks in glibc's store lib dir (which is
+  # on every binary's RUNPATH) for exactly the libs a running cartouche
+  # loads (verified via /proc/PID/maps): wayland client/cursor,
+  # vulkan-loader, xkbcommon, fontconfig (plus its deps freetype/libpng/
+  # zlib/bzip2/expat), pulseaudio. No glvnd libEGL/libGL (the Vulkan+Wayland
+  # path never loads EGL) and no libgbm/libxcb/libdrm (mesa's Vulkan ICD
+  # resolves those itself).
+  #
+  # Like fix-gpu-renderer.sh, the store paths are interpolated at eval time
+  # so this script always matches the nixpkgs rev this image was built with.
+  # --------------------------------------------------------------------------
+  cartouche-libs = pkgs.writeScript "cartouche-libs.sh" ''
+      #!/bin/sh
+      # Sourced from /entrypoint.sh — runs as root before gosu drops
+      # privileges. Safe under the entrypoint's set -e: every command has
+      # an exit-0 fallback and nothing bare-exits.
+
+      cartouche_libs_setup() {
+        cart_glibc_lib=${pkgs.glibc}/lib
+        [ -d "$cart_glibc_lib" ] || return 0
+
+        cart_link() {
+          name=$1 target=$2
+          [ -f "$target" ] || return 0
+          ln -sfn "$target" "$cart_glibc_lib/$name"
+        }
+
+        cart_link libwayland-client.so.0  ${pkgs.wayland}/lib/libwayland-client.so.0
+        cart_link libwayland-cursor.so.0  ${pkgs.wayland}/lib/libwayland-cursor.so.0
+        cart_link libvulkan.so.1   ${pkgs.vulkan-loader}/lib/libvulkan.so.1
+        cart_link libxkbcommon.so.0 ${pkgs.libxkbcommon}/lib/libxkbcommon.so.0
+        cart_link libfontconfig.so.1 ${pkgs.fontconfig.lib}/lib/libfontconfig.so.1
+        cart_link libfreetype.so.6 ${pkgs.freetype}/lib/libfreetype.so.6
+        cart_link libpng16.so.16 ${pkgs.libpng}/lib/libpng16.so.16
+        cart_link libz.so.1 ${pkgs.zlib}/lib/libz.so.1
+        cart_link libbz2.so.1 ${pkgs.bzip2.out}/lib/libbz2.so.1
+        cart_link libexpat.so.1 ${pkgs.expat}/lib/libexpat.so.1
+        cart_link libpulse.so.0 ${pkgs.pulseaudio}/lib/libpulse.so.0
+        cart_link libpulse-simple.so.0 ${pkgs.pulseaudio}/lib/libpulse-simple.so.0
+      }
+
+      cartouche_libs_setup
+      unset -f cartouche_libs_setup
+  '';
+
   # Cartouche (ROM cartridge launcher, Godot 4.7.2) — replaces
   # pegasus-frontend in this test image. Same derivation as the
   # T2theV/cartouche package.nix (fetchFromGitHub + headless Godot
@@ -65,11 +119,15 @@ let
     version = "0.4.1";
 
     # The Godot project, fetched from GitHub at a pinned commit.
-    src = (pkgs.fetchFromGitHub {
-      owner = "T2theV";
-      repo = "cartouche";
-      rev = "13791c3da9e5ca250fca0d2dfcc7421d9c495530";
-      hash = "sha256-38O6gskw9zstlFBKINt4Eb4kUBShBequ6vzZ2m+zz/8";
+    # fetchgit (git clone, content-addressed) not fetchFromGitHub: the
+    # latter's codeload tarball bytes regenerate non-deterministically on
+    # GitHub cache rebuilds, so a pinned tarball hash flaps between values
+    # (verified: Z9tDZo... vs QZ5LG... for the same rev). Git commits are
+    # stable forever; this unpacked-tree hash is deterministic.
+    src = (pkgs.fetchgit {
+      url = "https://github.com/T2theV/cartouche";
+      rev = "abb774ca2acbaf8a8df02d1de505bcfa0aad6995";
+      hash = "sha256-QZ5LGD6UhJ8Nf4LHPve8jg6AEOC0qa8Z9Mof6gTKwio=";
     }) + "/app";
 
     nativeBuildInputs = [ pkgs.unzip pkgs.glibc ];
@@ -143,6 +201,14 @@ in pkgs.dockerTools.buildLayeredImage {
   (pkgs.runCommand "etc" {} ''
     mkdir -p $out
     cp -r ${./supporting_files/gow/etc} $out/etc
+    # cp -r preserves the store path's read-only perms (555 dirs / 444
+    # files), so make the copied tree writable before adding
+    # cartouche-libs.sh below.
+    chmod -R u+w $out
+    # cartouche-libs.sh is generated at evaluation time (see above) so its
+    # glibc store path always matches this build's nixpkgs revision — it
+    # cannot be a static file here.
+    cp ${cartouche-libs} $out/etc/cont-init.d/25-cartouche-libs.sh
   '')
   # Canned emulator defaults ("canned init"). The trees land in /etc/cumulus-emu
   # and are seeded into $HOME on first boot by /etc/cont-init.d/40-cumulus-canned.sh
@@ -232,6 +298,7 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.glibc
     pkgs.xwayland
     pkgs.foot
+    pkgs.pipewire
     pkgs.libxcb-cursor
     pkgs.qt6.qtwayland    
     pkgs.findutils
@@ -248,6 +315,11 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.mako
     pkgs.systemd
     pkgs.fontconfig
+    # Explicit outputs the cartouche-libs.sh script symlinks at boot —
+    # the default outputs (pkgs.fontconfig = -bin, pkgs.bzip2 = -bin)
+    # don't carry the libs, so pin the outputs that do.
+    pkgs.fontconfig.lib
+    pkgs.bzip2.out
     pkgs.glibcLocales
 
     # Internet access: ping, DNS lookup, and CA certificates for TLS

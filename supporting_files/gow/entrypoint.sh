@@ -9,6 +9,13 @@ set -e
 mkdir -p /tmp
 chmod 1777 /tmp
 
+# The nix-built OpenSSL in this image ships CA certs at
+# /etc/ssl/certs/ca-bundle.crt, but the runtime's default trust path is
+# broken, so every HTTPS client (curl, Godot HTTPRequest) fails with
+# "unable to get local issuer certificate". Point OpenSSL at the bundle
+# explicitly; export so the whole process tree (cartouche, foot, ...) sees it.
+export SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt
+
 # Source functions from GOW utils
 source /opt/gow/bash-lib/utils.sh
 
