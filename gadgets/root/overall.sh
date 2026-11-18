@@ -15,6 +15,17 @@ source_dir2="${CUMULUS_SRC_LOCAL:-/etc/cumulus-emu/local}"
 destination_dir1="${HOME}/.config"
 destination_dir2="${HOME}/.local/share"
 
+# Copy the project.godot file to the working directory.
+# Cartouche is a Godot release export; Godot looks for project.godot in the
+# current directory before falling back to the binary's directory. Without it,
+# the main scene resource is null and cartouche exits immediately.
+if [ -f /etc/cumulus-emu/config/cartouche/project.godot ]; then
+    if [ ! -f "${HOME}/project.godot" ]; then
+        cp /etc/cumulus-emu/config/cartouche/project.godot "${HOME}/project.godot"
+        echo "Copied project.godot to ${HOME}/project.godot"
+    fi
+fi
+
 # Function to copy files from a source directory to a destination directory
 copy_files() {
     local source_dir=$1
