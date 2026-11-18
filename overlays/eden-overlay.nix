@@ -24,13 +24,7 @@ final: prev:
       sha256 = "cdac96d5691e673fa18b9dc149c7daaa9b2922bdee323e6d3e6c654a89c59362";
   };
   eden = prev.eden.overrideAttrs (old: {
-    # The video_core TUs (renderer_vulkan.cpp et al) compile with
-    # -flto=auto -fmodules-ts and peak well over 6GB each; the build host
-    # has 13.7GB total. 32-way parallel compiles trip the OOM killer.
-    # stdenv reads NIX_BUILD_CORES from the build environment; a per-derivation
-    # attribute is the only reliable override (sandbox env comes from the nix
-    # daemon, not the caller).
-    NIX_BUILD_CORES = 2;
+
     src = prev.eden.src.overrideAttrs(old: {
 	    tag = 0;
 	    rev = (builtins.fromJSON( builtins.readFile ./eden-out.json)).rev;
