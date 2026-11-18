@@ -76,6 +76,9 @@ pkgs.stdenv.mkDerivation rec {
     # after the executable with its last extension stripped.
     install -m 755 $TMPDIR/export/cartouche-linux.x86_64 $out/bin/cartouche
     install -m 644 $TMPDIR/export/cartouche-linux.pck $out/bin/cartouche.pck
+    # The project.godot file is required for the release export to
+    # find the main scene. Godot looks for it next to the binary.
+    install -m 644 project.godot $out/bin/project.godot
     runHook postInstall
   '';
 }
