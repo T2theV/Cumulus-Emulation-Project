@@ -116,7 +116,7 @@ let
 
 #  dol_retro = import ./emus/dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
-  name = "cep-cartouche";
+  name = "ghcr.io/t2thev/cumulus-emulation-project";
   tag = "ultra-nostalgia";
   contents = [ 
   (pkgs.runCommand "entrypoint" {} ''
