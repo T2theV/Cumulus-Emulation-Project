@@ -11,7 +11,7 @@ function launcher() {
   if [ -n "$RUN_GAMESCOPE" ]; then
     gow_log "[Gamescope] - Starting: \`$@\`"
 
-    GAMESCOPE_MODE=${GAMESCOPE_MODE:-"-f"}
+    GAMESCOPE_MODE=${GAMESCOPE_MODE:--f}
     # -w/-h pin the internal (XWayland) mode list to the output resolution so
     # apps don't pick a standard preset (e.g. 1440p) that gamescope then
     # letterboxes into a non-16:9 output.
