@@ -366,6 +366,8 @@ in pkgs.dockerTools.buildLayeredImage {
       "LANG=en_US.UTF-8"
       "QT_QPA_PLATFORM=wayland-egl"
       "GDK_BACKEND=wayland"
+      "CARTOUCHE_CONFIG=/home/retro/.config/cartouche/cartouche.conf"
+      "CARTOUCHE_GAMES_DIR=/ROMs"
     ];
   };
   
