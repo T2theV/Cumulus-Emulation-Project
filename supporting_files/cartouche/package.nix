@@ -17,8 +17,8 @@ pkgs.stdenv.mkDerivation rec {
   # stable forever; this unpacked-tree hash is deterministic.
   src = (pkgs.fetchgit {
     url = "https://github.com/T2theV/cartouche";
-    rev = "f7ba217a215ac138c61944a1b88a48625fbd50c4";
-    hash = "sha256-sOvOSABnHE0j1C4Y1pAdcYr0fBBm3AtzmEfaWIMEU1M=";
+    rev = "f4a60115b885917a63066cb5780555f1acda2a1f";
+    hash = "sha256-wMgqMJlZRKU2on0lAioh9sTdrItag1rbwJsER41/jyw=";
   }) + "/app";
 
   nativeBuildInputs = [ pkgs.unzip pkgs.glibc ];
