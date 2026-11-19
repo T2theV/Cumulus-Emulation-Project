@@ -18,7 +18,7 @@ pkgs.stdenv.mkDerivation rec {
   src = (pkgs.fetchgit {
     url = "https://github.com/T2theV/cartouche";
     rev = "f4a60115b885917a63066cb5780555f1acda2a1f";
-    hash = "sha256-wMgqMJlZRKU2on0lAioh9sTdrItag1rbwJsER41/jyw=";
+    hash = "sha256-vM8SNEjYEfZAXyiceBSuksbwYJVheliZgFKPZnqDyJA=";
   }) + "/app";
 
   nativeBuildInputs = [ pkgs.unzip pkgs.glibc ];
