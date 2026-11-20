@@ -26,8 +26,8 @@
 #
 # Overridable via environment:
 #   EDEN_DATA_DIR  (default $HOME/.local/share/eden)
-#   FIRMWARE_DIR   (default /ROMs/switch/firmware)
-#   KEYS_DIR       (default /ROMs/switch/keys)
+#   FIRMWARE_DIR   (default /ROMs/bios/switch)
+#   KEYS_DIR       (default /ROMs/bios/switch)
 #
 # Notes:
 #   * The image has NO `unzip` (and no `grep`). Extraction uses `7z` (p7zip, on
@@ -43,8 +43,8 @@ set -uo pipefail
 
 HOME="${HOME:-/home/retro}"
 EDEN_DATA_DIR="${EDEN_DATA_DIR:-$HOME/.local/share/eden}"
-FIRMWARE_DIR="${FIRMWARE_DIR:-/ROMs/switch/firmware}"
-KEYS_DIR="${KEYS_DIR:-/ROMs/switch/keys}"
+FIRMWARE_DIR="${FIRMWARE_DIR:-/ROMs/bios/switch}"
+KEYS_DIR="${KEYS_DIR:-/ROMs/bios/switch}"
 REGISTERED_DIR="$EDEN_DATA_DIR/nand/system/Contents/registered"
 KEYS_OUT_DIR="$EDEN_DATA_DIR/keys"
 # Temp/log base: $TMPDIR if usable, else a hidden dir in the Eden data dir

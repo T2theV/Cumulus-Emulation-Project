@@ -10,8 +10,16 @@
 # Pinned to the refs the script would track today (branch heads), not the
 # mutable branch refs: fetchFromGitHub pins by commit; the single-file
 # fetchurls point at raw.githubusercontent.com/<owner>/<repo>/<commit>/<path>,
-# which is immutable. compatibility_data.json comes from the rolling
-# release tag — mutable, see item 4.
+# which is immutable.
+#
+# compatibility_data.json is a release asset behind a MUTABLE tag (the repo's
+# CI re-publishes it; the data lives in the repo's issues, not in the repo
+# itself), so its hash is passed in as the `compatibilityData` formal rather
+# than hardcoded. It is optional: if null, the build proceeds without the
+# compatibility database. See overlays/fetch-compat-hash.sh (which writes
+# overlays/xenia-compat-data-hash.json from the GitHub API) and
+# overlays/xenia-edge-overlay.nix (which passes it in).
+{ compatibilityData ? null }:
 let p = import <nixpkgs> {};
     xenia-src = (import ./src.nix).src;  # grafted xenia-edge src (master.json)
 in rec {
@@ -37,24 +45,16 @@ in rec {
     sha256 = "DxeDG2qeDp/C9Sv4qxvvHTD/0wfZZsIRjlVts0XqfpY=";
   };
 
-  # 4. Game compatibility data — release asset. The tag is MUTABLE: the
-  #    repo's CI re-publishes the asset (the data lives in the repo's issues;
-  #    the repo itself has no data file), so re-pin the hash when upstream
-  #    updates — the build error prints the new hash.
-  compatibility-data = p.fetchurl {
-    url = "https://github.com/xenia-canary/game-compatibility/releases/download/game-compatibility/compatibility_data.json";
-    sha256 = "48c958d166be9da4b5c6460e3c2dd5a7bc8073f3e378e7fa9dbcbfc1fcde1603";
-  };
-
   # Combined tree mirroring build/data_repos/, plus the vendored
   # master.json taken from the pinned xenia-edge src (assets/... is in the
-  # FOD tarball).
+  # FOD tarball). The compatibility DB is included only when `compatibilityData`
+  # is non-null (a fetchurl with the live sha256); otherwise it is skipped.
   data-repos = p.runCommand "xenia-data-repos" {} ''
     mkdir -p $out/game-patches $out/x360db $out/SDL_GameControllerDB $out/game-compatibility
     cp -r ${game-patches}/* $out/game-patches/
     cp ${games-json} $out/x360db/games.json
     cp ${gamecontrollerdb} $out/SDL_GameControllerDB/gamecontrollerdb.txt
-    cp ${compatibility-data} $out/game-compatibility/compatibility_data.json
+    ${p.lib.optionalString (compatibilityData != null) "cp ${compatibilityData} $out/game-compatibility/compatibility_data.json"}
     cp ${xenia-src}/assets/game-compatibility/master.json $out/game-compatibility/master.json
   '';
 }

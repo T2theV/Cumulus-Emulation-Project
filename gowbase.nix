@@ -57,7 +57,7 @@ let
 
 #  dol_retro = import ./emus/dolphin.nix;
 in pkgs.dockerTools.buildLayeredImage {
-  name = "hello-docker";
+  name = "ghcr.io/t2thev/cumulus-emulation-project";
   tag = "latest";
   contents = [ 
   (pkgs.runCommand "entrypoint" {} ''
@@ -84,7 +84,7 @@ in pkgs.dockerTools.buildLayeredImage {
     chmod +x $out/etc/cumulus-emu/PS3FirmwareInstall/install-ps3-firmware.sh
     # EdenFirmwareInstall gadget -> /etc/cumulus-emu/EdenFirmwareInstall/
     # (auto-run on first boot by /etc/cont-init.d/50-eden-firmware.sh when a
-    #  Switch firmware zip is dropped in /ROMs/switch/firmware)
+    #  Switch firmware zip is dropped in /ROMs/bios/switch)
     cp -r ${./gadgets/root/EdenFirmwareInstall} $out/etc/cumulus-emu/EdenFirmwareInstall
     chmod +x $out/etc/cumulus-emu/EdenFirmwareInstall/install-eden-firmware.sh
     # XboxHddRestore gadget -> /etc/cumulus-emu/XboxHddRestore/
@@ -96,6 +96,9 @@ in pkgs.dockerTools.buildLayeredImage {
   (pkgs.runCommand "opt" {} ''
     mkdir -p $out
     cp -r ${./supporting_files/gow/opt} $out/opt
+    # cp -r preserves the store path's read-only perms (555 dirs / 444 files),
+    # so make the copied tree writable before adding fix-gpu-renderer.sh below.
+    chmod -R u+w $out
     # fix-gpu-renderer.sh is generated at evaluation time (see above) so
     # its MESA/glibc-locales store paths always match this build's
     # nixpkgs revision — it cannot be a static file here.
@@ -108,6 +111,15 @@ in pkgs.dockerTools.buildLayeredImage {
   (pkgs.runCommand "cfg" {} ''
     mkdir -p $out
     cp -r ${./supporting_files/gow/cfg} $out/cfg
+  '')
+  # /tmp must exist from container start: the entrypoint sources every
+  # /etc/cont-init.d/*.sh before fix-gpu-renderer.sh (which does
+  # mkdir -p /tmp), and init gadgets such as PS3FirmwareInstall write
+  # /tmp during init. Baked into the image; fix-gpu-renderer.sh's
+  # mkdir -p remains as a harmless no-op.
+  (pkgs.runCommand "tmp" {} ''
+    mkdir -p $out/tmp
+    chmod 1777 $out/tmp
   '')
 
 
