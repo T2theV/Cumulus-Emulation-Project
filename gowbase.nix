@@ -216,6 +216,7 @@ in pkgs.dockerTools.buildLayeredImage {
       "NEEDRESTART_SUSPEND=1"
       "LANG=en_US.UTF-8"
       "QT_QPA_PLATFORM=wayland-egl"
+      "GDK_BACKEND=wayland"
     ];
   };
   
