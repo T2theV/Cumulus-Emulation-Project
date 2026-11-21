@@ -59,5 +59,11 @@ copy_files "$source_dir2" "$destination_dir2"
 # crashed on a Permission denied creating its cache dirs). chown -R every
 # boot also repairs any tree already contaminated by an earlier boot.
 # Nonfatal: a missing user (weird boot) must never block container start.
-chown -R retro:retro "$destination_dir1" "$destination_dir2" 2>/dev/null \
+#
+# copy_files' mkdir -p also creates the .local/ parent as root (only
+# .local/share is a seed destination), so chown the whole .local tree --
+# not just the share dir -- otherwise .local stays root:root and a fresh
+# (755) .local would block the emulators from creating new top-level dirs
+# under it (RMG's saves live under .local/share).
+chown -R retro:retro "$destination_dir1" "${HOME}/.local" 2>/dev/null \
     || echo "[overall.sh] warning: could not chown seeded trees to retro"
