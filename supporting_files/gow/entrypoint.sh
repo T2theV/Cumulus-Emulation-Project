@@ -2,6 +2,13 @@
 
 set -e
 
+# Ensure /tmp exists and is world-writable before any cont-init script runs.
+# The image builder strips the store mode (the baked /tmp comes up root:755),
+# and scripts that run as users (e.g. ps3 firmware install as 'retro') need
+# write access from the very first init script.
+mkdir -p /tmp
+chmod 1777 /tmp
+
 # Source functions from GOW utils
 source /opt/gow/bash-lib/utils.sh
 
