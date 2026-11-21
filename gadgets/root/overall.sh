@@ -42,6 +42,13 @@ copy_files() {
     # Check if the file already exists in the destination directory
     if [ ! -f "$dest_file" ]; then
       cp "$file" "$dest_file"
+      # Pin the mode: a bare cp leaves the file at (source mode & ~umask),
+      # which boot-shell umask has made non-deterministic -- fresh volumes
+      # have been seen with read-only 444 configs that the emulator cores
+      # cannot write back (mupen64's ConfigSaveFile does fopen("w")/O_TRUNC
+      # and needs the owner write bit). 644 = owner-writable, everyone-
+      # readable; the chown pass below makes it retro:retro.
+      chmod 644 "$dest_file"
       echo "Copied $file to $dest_file"
     else
       echo "$file already exists at $dest_file"
@@ -67,3 +74,14 @@ copy_files "$source_dir2" "$destination_dir2"
 # under it (RMG's saves live under .local/share).
 chown -R retro:retro "$destination_dir1" "${HOME}/.local" 2>/dev/null \
     || echo "[overall.sh] warning: could not chown seeded trees to retro"
+
+# Mode repair pass (nonfatal): earlier boot runs seeded configs read-only
+# (444) because the seeder's cp inherited whatever umask the boot shell had.
+# The emulators need to write these back (mupen64's ConfigSaveFile does
+# fopen("w"), which needs the owner write bit), so add u+rw to every file
+# and u+rwx to every directory in the seeded trees each boot -- this heals
+# volumes that were already contaminated, without touching contents.
+# X = apply the execute bit only to directories (and files that already
+# have any execute bit), so plain config files stay non-executable.
+chmod -R u+rwX "$destination_dir1" "${HOME}/.local" 2>/dev/null \
+    || echo "[overall.sh] warning: could not chmod seeded trees to u+rwX"
