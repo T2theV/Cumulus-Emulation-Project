@@ -1,32 +1,32 @@
 Player 1 Input:
-  Handler: Evdev
-  Device: Sunshine X-Box One (virtual) pad
+  Handler: SDL
+  Device: Xbox One S Controller 1
   Config:
-    Left Stick Left: LX-
-    Left Stick Down: LY+
-    Left Stick Right: LX+
-    Left Stick Up: LY-
-    Right Stick Left: RX-
-    Right Stick Down: RY+
-    Right Stick Right: RX+
-    Right Stick Up: RY-
+    Left Stick Left: LS X-
+    Left Stick Down: LS Y-
+    Left Stick Right: LS X+
+    Left Stick Up: LS Y+
+    Right Stick Left: RS X-
+    Right Stick Down: RS Y-
+    Right Stick Right: RS X+
+    Right Stick Up: RS Y+
     Start: Start
-    Select: Select
-    PS Button: Mode
-    Square: X
-    Cross: A
-    Circle: B
-    Triangle: Y
-    Left: Hat0 X-
-    Down: Hat0 Y+
-    Right: Hat0 X+
-    Up: Hat0 Y-
-    R1: TR
-    R2: RZ+
-    R3: Thumb R
-    L1: TL
-    L2: LZ+
-    L3: Thumb L
+    Select: Back
+    PS Button: "Back&Start,Guide"
+    Square: West
+    Cross: South
+    Circle: East
+    Triangle: North
+    Left: Left
+    Down: Down
+    Right: Right
+    Up: Up
+    R1: RB
+    R2: RT
+    R3: RS
+    L1: LB
+    L2: LT
+    L3: LS
     IR Nose: ""
     IR Tail: ""
     IR Left: ""
@@ -34,19 +34,19 @@ Player 1 Input:
     Tilt Left: ""
     Tilt Right: ""
     Motion Sensor X:
-      Axis: X
+      Axis: ""
       Mirrored: false
       Shift: 0
     Motion Sensor Y:
-      Axis: Y
+      Axis: ""
       Mirrored: false
       Shift: 0
     Motion Sensor Z:
-      Axis: Z
+      Axis: ""
       Mirrored: false
       Shift: 0
     Motion Sensor G:
-      Axis: RY
+      Axis: ""
       Mirrored: false
       Shift: 0
     Orientation Reset Button: ""
@@ -59,24 +59,25 @@ Player 1 Input:
     Analog Limiter Toggle Mode: false
     Left Stick Multiplier: 100
     Right Stick Multiplier: 100
-    Left Stick Deadzone: 30
-    Right Stick Deadzone: 30
-    Left Stick Anti-Deadzone: 33
-    Right Stick Anti-Deadzone: 33
+    Left Stick Deadzone: 8000
+    Right Stick Deadzone: 8000
+    Left Stick Anti-Deadzone: 4259
+    Right Stick Anti-Deadzone: 4259
     Left Trigger Threshold: 0
     Right Trigger Threshold: 0
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
+    Left Pad Squircling Factor: 4000
+    Right Pad Squircling Factor: 4000
     Color Value R: 0
     Color Value G: 0
-    Color Value B: 0
+    Color Value B: 20
     Blink LED when battery is below 20%: true
     Use LED as a battery indicator: false
-    LED battery indicator brightness: 50
+    LED battery indicator brightness: 10
     Player LED enabled: true
     Large Vibration Motor Multiplier: 100
     Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
@@ -157,8 +158,8 @@ Player 2 Input:
     Right Stick Anti-Deadzone: 0
     Left Trigger Threshold: 0
     Right Trigger Threshold: 0
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
+    Left Pad Squircling Factor: 4000
+    Right Pad Squircling Factor: 4000
     Color Value R: 0
     Color Value G: 0
     Color Value B: 0
@@ -169,6 +170,7 @@ Player 2 Input:
     Large Vibration Motor Multiplier: 100
     Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
@@ -249,8 +251,8 @@ Player 3 Input:
     Right Stick Anti-Deadzone: 0
     Left Trigger Threshold: 0
     Right Trigger Threshold: 0
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
+    Left Pad Squircling Factor: 4000
+    Right Pad Squircling Factor: 4000
     Color Value R: 0
     Color Value G: 0
     Color Value B: 0
@@ -261,6 +263,7 @@ Player 3 Input:
     Large Vibration Motor Multiplier: 100
     Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
@@ -341,8 +344,8 @@ Player 4 Input:
     Right Stick Anti-Deadzone: 0
     Left Trigger Threshold: 0
     Right Trigger Threshold: 0
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
+    Left Pad Squircling Factor: 4000
+    Right Pad Squircling Factor: 4000
     Color Value R: 0
     Color Value G: 0
     Color Value B: 0
@@ -353,6 +356,7 @@ Player 4 Input:
     Large Vibration Motor Multiplier: 100
     Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
@@ -433,8 +437,8 @@ Player 5 Input:
     Right Stick Anti-Deadzone: 0
     Left Trigger Threshold: 0
     Right Trigger Threshold: 0
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
+    Left Pad Squircling Factor: 4000
+    Right Pad Squircling Factor: 4000
     Color Value R: 0
     Color Value G: 0
     Color Value B: 0
@@ -445,6 +449,7 @@ Player 5 Input:
     Large Vibration Motor Multiplier: 100
     Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
@@ -525,8 +530,8 @@ Player 6 Input:
     Right Stick Anti-Deadzone: 0
     Left Trigger Threshold: 0
     Right Trigger Threshold: 0
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
+    Left Pad Squircling Factor: 4000
+    Right Pad Squircling Factor: 4000
     Color Value R: 0
     Color Value G: 0
     Color Value B: 0
@@ -537,6 +542,7 @@ Player 6 Input:
     Large Vibration Motor Multiplier: 100
     Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
@@ -617,8 +623,8 @@ Player 7 Input:
     Right Stick Anti-Deadzone: 0
     Left Trigger Threshold: 0
     Right Trigger Threshold: 0
-    Left Pad Squircling Factor: 8000
-    Right Pad Squircling Factor: 8000
+    Left Pad Squircling Factor: 4000
+    Right Pad Squircling Factor: 4000
     Color Value R: 0
     Color Value G: 0
     Color Value B: 0
@@ -629,6 +635,7 @@ Player 7 Input:
     Large Vibration Motor Multiplier: 100
     Small Vibration Motor Multiplier: 100
     Switch Vibration Motors: false
+    Vibration Threshold: 63
     Mouse Movement Mode: Relative
     Mouse Deadzone X Axis: 60
     Mouse Deadzone Y Axis: 60
