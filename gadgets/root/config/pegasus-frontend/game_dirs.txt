@@ -1,0 +1,14 @@
+/ROMs/dreamcast
+/ROMs/gb
+/ROMs/gbc
+/ROMs/gba
+/ROMs/gc
+/ROMs/n64
+/ROMs/psx
+/ROMs/ps2
+/ROMs/ps3
+/ROMs/switch
+/ROMs/wii
+/ROMs/wiiu
+/ROMs/xbox
+/ROMs/xbox360
