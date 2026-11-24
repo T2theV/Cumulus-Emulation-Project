@@ -124,10 +124,10 @@ in pkgs.dockerTools.buildLayeredImage {
 
 
     pkgs.mesa
-    pkgs.mesa.opencl
-    pkgs.mesa.cross_tools
-    pkgs.mesa.spirv2dxil
-    pkgs.egl-gbm
+    # pkgs.mesa.opencl
+    # pkgs.mesa.cross_tools
+    # pkgs.mesa.spirv2dxil
+    # pkgs.egl-gbm
     pkgs.vulkan-headers
     pkgs.vulkan-loader
     pkgs.coreutils
@@ -215,7 +215,7 @@ in pkgs.dockerTools.buildLayeredImage {
       "TZ=America/Chicago" 
       "NEEDRESTART_SUSPEND=1"
       "LANG=en_US.UTF-8"
-      "QT_QPA_PLATFORM=wayland-egl"
+      "QT_QPA_PLATFORM=xcb"
     ];
   };
   

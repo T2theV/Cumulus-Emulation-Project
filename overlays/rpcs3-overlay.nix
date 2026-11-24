@@ -6,5 +6,8 @@ final: prev:
             rev=( builtins.fromJSON( builtins.readFile ./rpcs3-out.json)).rev;
             hash = "";
         });
+        cmakeFlags = [
+             (lib.cmakeBool "STATIC_LINK_LLVM" true)
+        ] ++ old.cmakeFlags;
     });
 }
