@@ -1,0 +1,151 @@
+# Minimized variant of gowbase.nix — KEEP ALL 8 EMULATORS, drop everything else.
+# Non-destructive reference: copy over gowbase.nix (or build this directly) when ready.
+#
+# What this file does (contents-level changes, safe to build):
+#   - removes pegasus-frontend   -> drops qtwebengine (~420 MB) + likely python3/flite/iso-codes
+#   - removes gtk3, xdg-desktop-portal, xdg-desktop-portal-gtk  (no emu uses GTK)
+#   - removes dev/debug tools: strace, clinfo, vulkan-tools, findutils, p7zip, xz, wget,
+#     libusb1, libGLU, xdpyinfo   (vulkan-tools is the transitive source of the 41 MB vulkan-headers)
+#   - removes the duplicated pkgs.coreutils (it was listed twice)
+#   - comments pkgs.qt5.qtbase  -> target ONE Qt (Qt6); re-enable only if PCSX2-qt/RPCS3 need Qt5
+#   - keeps: all 8 emulators, mesa/egl-gbm/vulkan-loader (GPU), glibc/gosu/shadow/getent/coreutils,
+#     curl/jq/dbus/ffmpeg/sdl2-compat/fontconfig, the sway+gamescope+foot+mangohud display pipeline,
+#     xwayland (X11 emus), qt6 (Qt6 for RPCS3/PCSX2), en_US locale, vulkan ICD.
+#
+# What this file does NOT do (build-level changes — see MINIMIZE notes / response):
+#   - rebuild mesa WITHOUT llvmpipe/softpipe  -> drops the ~550 MB LLVM (biggest single win)
+#   - pin nixpkgs to a fixed rev (dedups glibc/ffmpeg/perl/icu/gtk/mangohud/systemd x2, Qt5/6)
+#   - ensure exactly ONE ffmpeg across the 8 emu overlays
+#   - find + drop the systemd consumer (`nix why-depends <result> systemd`)
+#   - strip binaries + drop .debug/man/doc
+#   - collapse the ~99 Docker layers -> 1-2 (dockerTools builds 1 layer per Nix package)
+let
+  # PIN nixpkgs to a fixed rev so all 8 emu overlays + shared libs resolve from ONE source.
+  # (Currently floating: every rebuild shifts store paths and overlays pull different versions.)
+  nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable"; # TODO: pin rev+sha256
+  pkgs = import nixpkgs { overlays = [
+	(import ./overlays/xenia-edge-overlay.nix)
+	(import ./overlays/eden-overlay.nix)
+	(import ./overlays/eden-overlay-hash.nix)
+	(import ./overlays/dolphin-emu-overlay.nix)
+	(import ./overlays/dolphin-emu-overlay-hash.nix)
+	(import ./overlays/flycast-overlay.nix)
+	(import ./overlays/flycast-overlay-hash.nix)
+	(import ./overlays/pcsx2-overlay.nix)
+	(import ./overlays/pcsx2-overlay-hash.nix)
+	(import ./overlays/rmg-overlay.nix)
+	(import ./overlays/rmg-overlay-hash.nix)
+	(import ./overlays/rpcs3-overlay.nix)
+	(import ./overlays/rpcs3-overlay-hash.nix)
+ ];};
+  vulkan-icd-etc = pkgs.runCommand "vulkan-icd-etc" {} ''
+    mkdir -p $out/etc/vulkan/icd.d
+    cp ${pkgs.mesa}/share/vulkan/icd.d/*.json $out/etc/vulkan/icd.d/
+  '';
+in pkgs.dockerTools.buildLayeredImage {
+  name = "CEP-small";
+  tag = "latest";
+  contents = [
+  (pkgs.runCommand "entrypoint" {} ''
+    mkdir -p $out
+    cp ${./supporting_files/gow/entrypoint.sh} $out/entrypoint.sh
+  '')
+  (pkgs.runCommand "etc" {} ''
+    mkdir -p $out
+    cp -r ${./supporting_files/gow/etc} $out/etc
+  '')
+  (pkgs.runCommand "opt" {} ''
+    mkdir -p $out
+    cp -r ${./supporting_files/gow/opt} $out/opt
+  '')
+  (pkgs.runCommand "share" {} ''
+    mkdir -p $out
+    cp -r ${./supporting_files/gow/share} $out/share
+  '')
+  (pkgs.runCommand "cfg" {} ''
+    mkdir -p $out
+    cp -r ${./supporting_files/gow/cfg} $out/cfg
+  '')
+
+    # --- GPU: hardware DRI only -------------------------------------------------------------
+    # pkgs.mesa currently bundles llvmpipe+softpipe (CPU rasterizers) which drags in a
+    # ~550 MB LLVM. Build a no-llvmpipe mesa (override with GALLIUM_DRIVERS excluding
+    # llvmpipe+softpipe) and use it here -> removes ~550 MB + trims DRI to the target GPU.
+    pkgs.mesa
+    pkgs.egl-gbm
+    pkgs.vulkan-loader
+
+    # --- base runtime ------------------------------------------------------------------------
+    pkgs.glibc
+    pkgs.bash
+    pkgs.gosu
+    pkgs.shadow
+    pkgs.getent
+    pkgs.coreutils
+    pkgs.curl
+    pkgs.jq
+    pkgs.dbus
+    pkgs.ffmpeg            # ensure exactly ONE across all emu overlays (pin rev)
+    pkgs.sdl2-compat
+    pkgs.fontconfig
+    # en_US.UTF-8 only (full set was ~205 MB of extra locale archives).
+    (pkgs.callPackage (builtins.toPath nixpkgs + "/pkgs/development/libraries/glibc/locales.nix") {
+      allLocales = false;
+      locales = [ "en_US.UTF-8/UTF-8" ];
+    })
+
+    # --- display / windowing (the webtop surface) ------------------------------------------
+    # Kept: this is the config'd display pipeline (sway + gamescope + foot + mangohud).
+    pkgs.xwayland
+    pkgs.sway
+    pkgs.gamescope
+    pkgs.foot
+    pkgs.mangohud
+    pkgs.libxcb-cursor
+    pkgs.xcb-util-cursor
+    pkgs.xkbcomp
+    # Small/config'd; keep for the panel + notifications, drop only if you go panel-less.
+    pkgs.waybar
+    pkgs.mako
+
+    # --- Qt (RPCS3 uses Qt6 + QML; PCSX2-qt historically Qt5) ----------------------------
+    # Target ONE Qt: rebuild pcsx2-qt on Qt6, then this stays as just qt6.
+    pkgs.qt6.qtbase
+    pkgs.qt6.qtwayland
+    # pkgs.qt5.qtbase   # re-enable only if PCSX2-qt/RPCS3 cannot build on Qt6
+
+    # --- emulators (all 8 — kept per request) ---------------------------------------------
+    pkgs.xenia-edge
+    pkgs.eden
+    pkgs.dolphin-emu
+    pkgs.flycast
+    pkgs.rpcs3
+    pkgs.xemu
+    pkgs.rmg
+    pkgs.pcsx2
+
+    # --- REMOVED for size (see top-of-file) ----------------------------------------------
+    # pkgs.pegasus-frontend   # -> qtwebengine ~420 MB (+ likely python3/flite/iso-codes)
+    # pkgs.gtk3  pkgs.xdg-desktop-portal  pkgs.xdg-desktop-portal-gtk
+    # pkgs.strace  pkgs.clinfo  pkgs.vulkan-tools  pkgs.findutils  pkgs.p7zip  pkgs.xz
+    # pkgs.wget  pkgs.libusb1  pkgs.libGLU  pkgs.xdpyinfo
+    # pkgs.coreutils   (was a duplicate entry)
+
+    pkgs.dockerTools.binSh
+    pkgs.dockerTools.usrBinEnv
+   ];
+  config = {
+    Cmd = [ "/bin/sh" "/entrypoint.sh" ];
+    Env = [
+      "PUID=1000"
+      "PGID=1000"
+      "UMASK=000"
+      "UNAME=retro"
+      "HOME=/home/retro"
+      "TZ=America/Chicago"
+      "NEEDRESTART_SUSPEND=1"
+      "LANG=en_US.UTF-8"
+      "QT_QPA_PLATFORM=wayland-egl"
+    ];
+  };
+}
