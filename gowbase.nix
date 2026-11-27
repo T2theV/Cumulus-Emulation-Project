@@ -36,6 +36,14 @@ let
      cp -r ${pkgs0.lib.getLib pkgs0.llvmPackages.libllvm}/lib $T/lib
      chmod -R u+w $T/lib
      find $T/lib -name '*.a' -delete
+     # The copied .so files carry the ORIGINAL -lib store path baked
+     # into their RUNPATH (libLTO/LLVMgold/libRemarks link
+     # libLLVM.so.21.1 from their own directory). Unrepointed, nix
+     # records the original -lib as a runtime reference of THIS output
+     # and the whole 551 MB original enters the image. Same-length
+     # replacement, same trick as slimDevllvm below.
+     find $T/lib -type f -exec sed -i \
+       "s|${pkgs0.lib.getLib pkgs0.llvmPackages.libllvm}|$out|g" {} +
      mkdir -p $out
      mv $T/lib $out/
    '';
