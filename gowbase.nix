@@ -206,7 +206,6 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.qt5.qtbase
     pkgs.qt6.qtbase
     pkgs.wget
-    pkgs.x11docker
     pkgs.clinfo
     pkgs.vulkan-tools
     pkgs.libusb1
@@ -225,9 +224,6 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.strace
     pkgs.xcb-util-cursor
     pkgs.gamescope
-    pkgs.waybar
-    pkgs.sway
-    pkgs.mangohud
     pkgs.xdpyinfo
     pkgs.xkbcomp
     pkgs.xdg-desktop-portal
