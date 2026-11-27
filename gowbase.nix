@@ -95,15 +95,14 @@ let
   # resolves to a different /nix/store hash: a static copy of the script
   # (as previously shipped under supporting_files/gow/opt/) bakes in
   # store paths that are no longer present in the image, leaving
-  # /run/opengl-driver, the Vulkan ICD and the locale-archive symlinks
-  # dangling. ${pkgs.mesa} / ${pkgs.glibcLocales} are interpolated at
-  # evaluation time, so the paths in the script always match the
-  # revision this file resolves to. The "opt" content below installs it
-  # as /opt/gow/fix-gpu-renderer.sh, which entrypoint.sh sources.
+  # /run/opengl-driver and the Vulkan ICD symlinks dangling.
+  # ${pkgs.mesa} is interpolated at evaluation time, so the paths in
+  # the script always match the revision this file resolves to. The
+  # "opt" content below installs it as /opt/gow/fix-gpu-renderer.sh,
+  # which entrypoint.sh sources.
   fix-gpu-renderer = pkgs.writeScript "fix-gpu-renderer.sh" ''
     #!/bin/bash
     MESA=${pkgs.mesa}
-    GLIBC_LOCALES=${pkgs.glibcLocales}
     mkdir -p /home/retro/.config/vulkan/icd.d /etc/glvnd/egl_vendor.d
     ln -sf "$MESA/share/vulkan/icd.d/radeon_icd.x86_64.json" \
           /home/retro/.config/vulkan/icd.d/radeon_icd.x86_64.json
@@ -114,8 +113,6 @@ let
     mkdir -p /tmp
     chmod 1777 /tmp
     mkdir -p /dev/input
-    ln -s "$GLIBC_LOCALES/lib" /usr
-    export LOCALE_ARCHIVE=/usr/lib/locale/locale-archive
   '';
 
 #  dol_retro = import ./emus/dolphin.nix;
@@ -163,7 +160,7 @@ in pkgs.dockerTools.buildLayeredImage {
     # so make the copied tree writable before adding fix-gpu-renderer.sh below.
     chmod -R u+w $out
     # fix-gpu-renderer.sh is generated at evaluation time (see above) so
-    # its MESA/glibc-locales store paths always match this build's
+    # its MESA store path always matches this build's
     # nixpkgs revision — it cannot be a static file here.
     cp ${fix-gpu-renderer} $out/opt/gow/fix-gpu-renderer.sh
   '')
@@ -231,7 +228,6 @@ in pkgs.dockerTools.buildLayeredImage {
     pkgs.mako
     pkgs.systemd
     pkgs.fontconfig
-    pkgs.glibcLocales
 
     # Internet access: ping, DNS lookup, and CA certificates for TLS
     pkgs.iputils        # ping (iputils)
