@@ -1,6 +1,8 @@
 let
   nixpkgs = fetchTarball "https://github.com/NixOS/nixpkgs/tarball/nixos-unstable";
-  pkgs = import nixpkgs { overlays = [
+  pkgs0 = import nixpkgs {
+    allowUnfree = true; # rpcs3 (and friends) carry unfree meta licenses
+    overlays = [
 	(import ./overlays/xenia-edge-overlay.nix)
 	(import ./overlays/eden-overlay.nix)
 	(import ./overlays/eden-overlay-hash.nix)
@@ -15,6 +17,59 @@ let
 	(import ./overlays/rpcs3-overlay.nix)
 	(import ./overlays/rpcs3-overlay-hash.nix)
  ];};
+
+ # Mesa's libgallium links libLLVM.so unconditionally (VA state
+ # tracker), so the full -lib output (~551 MB, mostly static .a
+ # archives) would otherwise enter the image via mesa's RUNPATH.
+ # These slim derivations keep the EXACT names of the original outputs
+ # ("llvm-21.1.8-lib" / "llvm-21.1.8-dev"), so their store paths are
+ # byte-identical in length to the originals: llvm-config is a prebuilt
+ # ELF with the original paths baked into .rodata, and replacing a path
+ # with a differently-lengthed string shifts section offsets and
+ # corrupts the binary. Same-length replacement keeps it intact.
+ slimLibllvm = pkgs0.stdenv.mkDerivation {
+   pname = "llvm"; version = "${pkgs0.llvmPackages.libllvm.version}-lib";
+   nativeBuildInputs = [ pkgs0.gnused ];
+   unpackPhase = "true";
+   buildPhase = ''
+     T=$(mktemp -d)
+     cp -r ${pkgs0.lib.getLib pkgs0.llvmPackages.libllvm}/lib $T/lib
+     chmod -R u+w $T/lib
+     find $T/lib -name '*.a' -delete
+     mkdir -p $out
+     mv $T/lib $out/
+   '';
+   installPhase = "true";
+ };
+ slimDevllvm = pkgs0.stdenv.mkDerivation {
+   pname = "llvm"; version = "${pkgs0.llvmPackages.libllvm.version}-dev";
+   nativeBuildInputs = [ pkgs0.gnused slimLibllvm ];
+   unpackPhase = "true";
+   buildPhase = ''
+     T=$(mktemp -d)
+     cp -r ${pkgs0.lib.getDev pkgs0.llvmPackages.libllvm}/bin $T/bin
+     cp -r ${pkgs0.lib.getDev pkgs0.llvmPackages.libllvm}/lib $T/lib
+     cp -r ${pkgs0.lib.getDev pkgs0.llvmPackages.libllvm}/include $T/include
+     chmod -R u+w $T
+     # Repoint every baked-in store path (llvm-config ELF + cmake text +
+     # headers); both replacements are same-length by construction.
+     find $T -type f -exec sed -i \
+       "s|${pkgs0.lib.getLib pkgs0.llvmPackages.libllvm}|${slimLibllvm}|g; s|${pkgs0.lib.getDev pkgs0.llvmPackages.libllvm}|$out|g" {} +
+     mkdir -p $out
+     mv $T/bin $T/lib $T/include $out/
+   '';
+   installPhase = "true";
+ };
+ mesaSlim = pkgs0.mesa.override {
+   llvmPackages = pkgs0.llvmPackages // { libllvm = slimDevllvm; };
+ };
+ # Inject the slim mesa into the package set as a constant. A plain
+ # overlay (mesa = prev.mesa.override {...}) infinite-recurses in this
+ # nixpkgs: the override body forces prev.mesa, whose stdenv resolution
+ # walks back through the same fixed point. Computing the drv above
+ # (outside the fixed point) and injecting a constant sidesteps that.
+ # Every pkgs.* below now resolves mesa dependents against mesaSlim.
+ pkgs = pkgs0.extend (final: prev: { mesa = mesaSlim; });
   # Mesa's Vulkan ICD manifests live in $mesa/share/vulkan/icd.d, which
   # the Vulkan loader never searches: this loader generation searches XDG
   # locations ($HOME/.config/vulkan/icd.d first, then the XDG_CONFIG_DIRS
